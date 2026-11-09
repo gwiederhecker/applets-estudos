@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Quanto o meu dinheiro vai valer?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{
+  --paper:#F6FAF8; --surface:#FFFFFF; --ink:#10343B; --muted:#56696C; --line:#D5E2DC;
+  --mint:#CFEBDD; --teal:#16756A; --coin:#C98A12; --coin-soft:#FBEFD6; --plum:#7B3F6E; --plum-soft:#F3E6EF;
+  --danger:#A3352B;
+  color-scheme: light;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#0E1D20; --surface:#14282C; --ink:#E4EFEB; --muted:#9DB2AD; --line:#29403F;
+    --mint:#1D4A43; --teal:#5FC8B5; --coin:#F0B94B; --coin-soft:#3A2F17; --plum:#D795C6; --plum-soft:#3A2335;
+    --danger:#F08A7E; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0E1D20; --surface:#14282C; --ink:#E4EFEB; --muted:#9DB2AD; --line:#29403F;
+  --mint:#1D4A43; --teal:#5FC8B5; --coin:#F0B94B; --coin-soft:#3A2F17; --plum:#D795C6; --plum-soft:#3A2335;
+  --danger:#F08A7E; color-scheme: dark;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--paper);color:var(--ink);
+  font:17px/1.6 "Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:780px;margin:0 auto;padding:28px 20px 64px}
+h1,h2,h3,.sentence,.big{font-family:"Bricolage Grotesque","Atkinson Hyperlegible",system-ui,sans-serif}
+h1{font-size:clamp(30px,6vw,46px);line-height:1.05;font-weight:800;margin:8px 0 18px;letter-spacing:-0.01em}
+h2{font-size:24px;line-height:1.2;margin:48px 0 10px;font-weight:700}
+h3{font-size:18px;margin:22px 0 6px}
+p{margin:0 0 12px;max-width:68ch}
+.lead{color:var(--muted);margin-bottom:22px}
+.num{font-variant-numeric:tabular-nums}
+
+/* Frase-montagem: o elemento principal da página */
+.sentence{font-size:clamp(22px,4.2vw,31px);line-height:1.75;font-weight:500;
+  background:var(--surface);border:1.5px solid var(--line);border-radius:18px;padding:22px 24px}
+.sentence input,.sentence select{
+  font:inherit;font-weight:700;color:var(--ink);background:var(--coin-soft);
+  border:none;border-bottom:3px solid var(--coin);border-radius:8px 8px 2px 2px;
+  padding:0 8px;margin:0 2px;line-height:1.25;-moz-appearance:textfield}
+.sentence input{width:4.6em;text-align:right}
+.sentence input.short{width:2.8em}
+.sentence select{cursor:pointer;padding-right:4px;max-width:100%}
+.sentence input::-webkit-outer-spin-button,.sentence input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+input:focus-visible,select:focus-visible,button:focus-visible,summary:focus-visible{outline:3px solid var(--teal);outline-offset:2px}
+
+/* Resultado */
+.result{margin-top:26px}
+.big{font-size:clamp(38px,8vw,60px);font-weight:800;line-height:1;color:var(--teal);margin:4px 0 6px}
+.big-label{color:var(--muted);font-size:16px}
+.ledger{display:grid;grid-template-columns:1fr auto;gap:0;margin:18px 0 6px;max-width:520px}
+.ledger div{padding:7px 0;border-bottom:1px solid var(--line)}
+.ledger .v{text-align:right;font-variant-numeric:tabular-nums;font-weight:700}
+.ledger .minus{color:var(--danger)}
+.ledger .total{border-bottom:none;padding-top:10px;font-weight:700}
+.real{margin-top:18px;background:var(--plum-soft);border-left:5px solid var(--plum);
+  padding:14px 18px;border-radius:0 12px 12px 0}
+.real strong{color:var(--plum)}
+
+.chart-wrap{position:relative;height:320px;margin:22px 0 4px}
+.legend{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:14px;color:var(--muted)}
+.legend span::before{content:"";display:inline-block;width:14px;height:4px;border-radius:2px;margin-right:6px;vertical-align:middle;background:var(--c)}
+
+.table-scroll{overflow-x:auto;margin-top:10px}
+table{border-collapse:collapse;width:100%;min-width:560px;font-variant-numeric:tabular-nums}
+th,td{padding:10px 10px;text-align:right;border-bottom:1px solid var(--line);font-size:15.5px}
+th:first-child,td:first-child{text-align:left}
+th{font-weight:700;color:var(--muted);font-size:14px}
+tr.sel td{background:var(--mint);font-weight:700}
+.pos{color:var(--teal)} .neg{color:var(--danger)}
+
+.goal{background:var(--surface);border:1.5px solid var(--line);border-radius:18px;padding:18px 20px}
+.goal .sentence-sm{font-family:"Bricolage Grotesque",sans-serif;font-size:21px;line-height:1.8}
+.goal input{font:inherit;font-weight:700;color:var(--ink);background:var(--coin-soft);border:none;border-bottom:3px solid var(--coin);border-radius:8px 8px 2px 2px;padding:0 6px;width:6em;text-align:right}
+.goal input.wide{width:9em;text-align:left}
+.goal-out{margin-top:10px;font-size:18px}
+
+details{background:var(--surface);border:1.5px solid var(--line);border-radius:14px;padding:4px 18px;margin:12px 0}
+summary{cursor:pointer;font-weight:700;padding:12px 0;font-family:"Bricolage Grotesque",sans-serif;font-size:19px}
+details[open] summary{border-bottom:1px solid var(--line);margin-bottom:10px}
+.formula{font-family:"Bricolage Grotesque",sans-serif;font-size:19px;background:var(--paper);border-radius:10px;padding:10px 14px;margin:8px 0 12px;overflow-x:auto;white-space:nowrap}
+.warn{color:var(--danger);font-weight:700}
+
+.settings{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px 22px;margin-top:6px}
+.settings label{display:block;font-size:15px;color:var(--muted)}
+.settings .row{display:flex;align-items:center;gap:10px}
+.settings input[type=range]{flex:1;accent-color:var(--teal)}
+.settings output{min-width:4.8em;text-align:right;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums}
+.fine{font-size:14px;color:var(--muted);margin-top:30px}
+button.reset{font:inherit;font-size:15px;background:none;border:1.5px solid var(--line);color:var(--ink);border-radius:999px;padding:6px 14px;cursor:pointer;margin-top:12px}
+@media (max-width:520px){ main{padding:20px 14px 48px} .sentence{padding:16px} }
+@media (prefers-reduced-motion: reduce){ *{transition:none!important;animation:none!important} }
+</style>
+</head>
+<body>
+<main>
+  <h1>Quanto o meu dinheiro vai valer?</h1>
+  <p class="lead">Escreva o seu plano na frase. O simulador aplica juros compostos mês a mês, desconta o Imposto de Renda e mostra quanto o dinheiro compra depois que a inflação faz a parte dela.</p>
+
+  <div class="sentence" id="plan">
+    Eu tenho R$&nbsp;<input id="ini" aria-label="valor inicial" type="number" inputmode="decimal" min="0" step="10" value="1000"> guardados
+    e vou colocar mais R$&nbsp;<input id="mes" type="number" inputmode="decimal" min="0" step="5" value="50" aria-label="depósito mensal"> todo mês,
+    durante <input id="prazo" class="short" type="number" inputmode="numeric" min="1" max="360" step="1" value="24" aria-label="prazo em meses"> meses,
+    no <select id="tipo" aria-label="onde guardar">
+      <option value="selic" selected>Tesouro Selic</option>
+      <option value="cdb">CDB do banco</option>
+      <option value="poup">poupança</option>
+      <option value="cofre">cofrinho</option>
+    </select>.
+  </div>
+
+  <section class="result" aria-live="polite">
+    <div class="big-label" id="bigLabel">Daqui a 24 meses você terá na conta</div>
+    <div class="big num" id="big">—</div>
+    <div class="ledger" id="ledger"></div>
+    <div class="real" id="real"></div>
+  </section>
+
+  <h2>Mês a mês</h2>
+  <div class="legend">
+    <span style="--c:var(--muted)">Quanto você depositou</span>
+    <span style="--c:var(--teal)">Na conta, já sem imposto</span>
+    <span style="--c:var(--plum)">O que isso compra, em reais de hoje</span>
+  </div>
+  <div class="chart-wrap"><canvas id="chart" aria-label="Gráfico da evolução do dinheiro mês a mês" role="img"></canvas></div>
+  <p style="font-size:15px;color:var(--muted)">A área entre a linha cinza e a verde é o ganho de capital (os juros). A distância entre a verde e a roxa é o que a inflação come.</p>
+
+  <h2>E se fosse em outro lugar?</h2>
+  <p>O mesmo plano, nas quatro opções. A linha destacada é a que está na frase.</p>
+  <div class="table-scroll"><table id="cmp">
+    <thead><tr><th>Onde</th><th>Na conta</th><th>Juros</th><th>Imposto</th><th>Em reais de hoje</th><th>Ganho real</th></tr></thead>
+    <tbody></tbody>
+  </table></div>
+
+  <h2>Uma meta de compra</h2>
+  <div class="goal">
+    <div class="sentence-sm">Quero comprar <input id="item" class="wide" type="text" value="um videogame" aria-label="o que você quer comprar">, que hoje custa R$&nbsp;<input id="preco" type="number" inputmode="decimal" min="0" step="50" value="3000" aria-label="preço hoje">.</div>
+    <div class="goal-out" id="goalOut"></div>
+    <p style="font-size:15px;color:var(--muted);margin-top:8px">O preço também sobe com a inflação, então o alvo se mexe. O simulador usa os mesmos depósitos da frase lá de cima.</p>
+  </div>
+
+  <h2>Por dentro da conta</h2>
+  <details open>
+    <summary>1. O fator do mês</summary>
+    <div id="expFator"></div>
+  </details>
+  <details>
+    <summary>2. Juros compostos: os três primeiros meses</summary>
+    <div id="expMeses"></div>
+  </details>
+  <details>
+    <summary>3. O imposto sobre o rendimento</summary>
+    <div id="expIR"></div>
+  </details>
+  <details>
+    <summary>4. A inflação e o ganho real</summary>
+    <div id="expReal"></div>
+  </details>
+  <details>
+    <summary>5. Em quanto tempo o dinheiro dobra?</summary>
+    <div id="expDobra"></div>
+  </details>
+
+  <h2>O cenário</h2>
+  <p>Valores de outubro de 2026. Eles mudam: mexa aqui para ver o que acontece se a Selic cair ou a inflação subir.</p>
+  <div class="settings">
+    <div><label for="selic">Taxa Selic (ao ano)</label><div class="row"><input id="selic" type="range" min="2" max="20" step="0.25" value="13.75"><output id="oSelic"></output></div></div>
+    <div><label for="ipca">Inflação, IPCA (ao ano)</label><div class="row"><input id="ipca" type="range" min="0" max="12" step="0.01" value="4.57"><output id="oIpca"></output></div></div>
+    <div><label for="pcdi">CDB paga quantos % do CDI</label><div class="row"><input id="pcdi" type="range" min="80" max="130" step="1" value="100"><output id="oPcdi"></output></div></div>
+    <div><label for="tr">TR da poupança (ao mês)</label><div class="row"><input id="tr" type="range" min="0" max="0.3" step="0.01" value="0.17"><output id="oTr"></output></div></div>
+  </div>
+  <button class="reset" id="reset" type="button">Voltar aos valores de outubro de 2026</button>
+
+  <p class="fine">
+    Como o simulador calcula: cada depósito entra no começo do mês e rende juros compostos até o fim do prazo.
+    Tesouro Selic rende a Selic; o CDB rende a porcentagem escolhida do CDI (CDI ≈ Selic − 0,10 ponto);
+    a poupança rende 0,5% ao mês + TR quando a Selic passa de 8,5% ao ano (abaixo disso, 70% da Selic + TR) e não paga imposto.
+    O Imposto de Renda do Tesouro e do CDB segue a tabela regressiva (22,5% até 180 dias, 20% até 360, 17,5% até 720 e 15% depois),
+    calculado separadamente para cada depósito. No Tesouro Selic há taxa de custódia de 0,20% ao ano só sobre o que passar de R$&nbsp;10 mil.
+    A hipótese mais forte é que Selic e inflação fiquem paradas durante todo o prazo, o que quase nunca acontece.
+    Isto é um exercício de matemática, não uma recomendação de investimento. Fontes: Banco Central (Copom de 16/09/2026, poupança), IBGE (IPCA até set/2026).
+  </p>
+</main>
+
+<script>
+(function(){
+  "use strict";
+  const $ = id => document.getElementById(id);
+  const DEF = {selic:13.75, ipca:4.57, pcdi:100, tr:0.17};
+  const brl = new Intl.NumberFormat("pt-BR",{style:"currency",currency:"BRL"});
+  const brl0 = new Intl.NumberFormat("pt-BR",{style:"currency",currency:"BRL",maximumFractionDigits:0});
+  const pct = (x,d=2) => (x*100).toLocaleString("pt-BR",{minimumFractionDigits:d,maximumFractionDigits:d})+"%";
+  const dec = (x,d=4) => x.toLocaleString("pt-BR",{minimumFractionDigits:d,maximumFractionDigits:d});
+  const NAMES = {selic:"Tesouro Selic", cdb:"CDB do banco", poup:"Poupança", cofre:"Cofrinho"};
+  const num = (el,def=0) => { const v = parseFloat(String(el.value).replace(",", ".")); return isFinite(v) && v >= 0 ? v : def; };
+
+  function params(){
+    return { S:num($("selic"))/100, pi:num($("ipca"))/100, p:num($("pcdi"))/100, tr:num($("tr"))/100 };
+  }
+  function monthlyRate(type, P){
+    if(type==="selic") return Math.pow(1+P.S,1/12)-1;
+    if(type==="cdb"){ const cdi=Math.max(P.S-0.001,0); const d=Math.pow(1+cdi,1/252)-1; return Math.pow(1+P.p*d,21)-1; }
+    if(type==="poup"){ const base = P.S>0.085 ? 0.005 : Math.pow(1+0.7*P.S,1/12)-1; return base+P.tr; }
+    return 0;
+  }
+  function aliquota(days){ return days<=180?0.225:days<=360?0.20:days<=720?0.175:0.15; }
+  const taxed = t => t==="selic"||t==="cdb";
+
+  // Simula mês a mês; devolve séries para m = 0..n
+  function simulate(type, n, ini, mes, P){
+    const r = monthlyRate(type,P), F = 1+r, defl = Math.pow(1+P.pi,1/12);
+    const lots = []; // {amt, val, age}
+    const out = {dep:[0], gross:[0], ir:[0], net:[0], real:[0], r};
+    let dep=0;
+    for(let m=1;m<=n;m++){
+      const a = (m===1?ini:0) + mes;
+      if(a>0){ lots.push({amt:a,val:a,age:0}); dep+=a; }
+      let tot=0;
+      for(const L of lots){ L.val*=F; L.age++; tot+=L.val; }
+      if(type==="selic" && tot>10000){ const fee=(tot-10000)*0.002/12; for(const L of lots){ L.val-=fee*L.val/tot; } tot-=fee; }
+      let ir=0;
+      if(taxed(type)) for(const L of lots){ const g=L.val-L.amt; if(g>0) ir+=g*aliquota(Math.round(L.age*30.42)); }
+      const net=tot-ir;
+      out.dep.push(dep); out.gross.push(tot); out.ir.push(ir); out.net.push(net); out.real.push(net/Math.pow(defl,m));
+    }
+    return out;
+  }
+
+  let chart=null;
+  function css(v){ return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+  function drawChart(sim,n){
+    const labels=[...Array(n+1).keys()];
+    const ink=css("--muted"), grid=css("--line");
+    const ds=[
+      {label:"Depositado",data:sim.dep,borderColor:css("--muted"),borderDash:[6,5],borderWidth:2,pointRadius:0,stepped:true,fill:false},
+      {label:"Na conta (líquido)",data:sim.net,borderColor:css("--teal"),backgroundColor:css("--mint"),borderWidth:3,pointRadius:0,fill:"-1"},
+      {label:"Em reais de hoje",data:sim.real,borderColor:css("--plum"),borderWidth:2.5,pointRadius:0,fill:false}
+    ];
+    if(typeof Chart==="undefined"){ $("chart").parentElement.innerHTML='<p>O gráfico não carregou. Os números acima continuam certos.</p>'; return; }
+    if(chart){ chart.data.labels=labels; chart.data.datasets.forEach((d,i)=>{d.data=ds[i].data;d.borderColor=ds[i].borderColor;if(ds[i].backgroundColor)d.backgroundColor=ds[i].backgroundColor;}); 
+      chart.options.scales.x.ticks.color=ink; chart.options.scales.y.ticks.color=ink; chart.options.scales.x.grid.color=grid; chart.options.scales.y.grid.color=grid; chart.update(); return; }
+    chart=new Chart($("chart"),{type:"line",data:{labels,datasets:ds},
+      options:{responsive:true,maintainAspectRatio:false,animation:false,interaction:{mode:"index",intersect:false},
+        plugins:{legend:{display:false},tooltip:{callbacks:{title:it=>"Mês "+it[0].label,label:c=>" "+c.dataset.label+": "+brl.format(c.parsed.y)}}},
+        scales:{x:{title:{display:true,text:"meses",color:ink},ticks:{color:ink,maxTicksLimit:9},grid:{color:grid}},
+                y:{ticks:{color:ink,callback:v=>brl0.format(v)},grid:{color:grid}}}}});
+  }
+
+  function render(){
+    const P=params();
+    const ini=num($("ini")), mes=num($("mes"));
+    let n=Math.round(num($("prazo"),24)); n=Math.min(Math.max(n,1),360);
+    const type=$("tipo").value;
+    const s=simulate(type,n,ini,mes,P);
+    const dep=s.dep[n], gross=s.gross[n], ir=s.ir[n], net=s.net[n], real=s.real[n];
+    const juros=gross-dep;
+    const anos = n%12===0 ? (n/12)+(n===12?" ano":" anos") : n+" meses";
+
+    $("bigLabel").textContent=`Daqui a ${anos}${type==="cofre"?", no cofrinho,":""} você terá na conta`;
+    $("big").textContent=brl.format(net);
+    let L=`<div>Você depositou</div><div class="v">${brl.format(dep)}</div>`;
+    L+=`<div>Os juros renderam (ganho de capital)</div><div class="v pos">+ ${brl.format(juros)}</div>`;
+    if(taxed(type)) L+=`<div>O Imposto de Renda levou</div><div class="v minus">− ${brl.format(ir)}</div>`;
+    else L+=`<div>Imposto de Renda</div><div class="v">${type==="poup"?"isenta":"—"}</div>`;
+    L+=`<div class="total">Fica na conta</div><div class="v total">${brl.format(net)}</div>`;
+    $("ledger").innerHTML=L;
+
+    const priceFactor=Math.pow(1+P.pi,n/12);
+    const realGain = real-dep; // em reais de hoje, comparado com o total depositado (aproximação simples)
+    $("real").innerHTML = `Mas os preços também sobem. Com inflação de ${pct(P.pi)} ao ano, o que hoje custa R$&nbsp;100 vai custar ${brl.format(100*priceFactor)}.
+      Por isso os ${brl.format(net)} vão comprar o mesmo que <strong>${brl.format(real)}</strong> compram hoje.
+      ${realGain>=0.005 ? `Em poder de compra, você ganhou cerca de <strong>${brl.format(realGain)}</strong> além do que guardou.` 
+        : `Em poder de compra, você <strong>perdeu ${brl.format(-realGain)}</strong> em relação ao que guardou.`}
+      ${mes>0?'<br><span style="font-size:14px;color:var(--muted)">(Comparação simples: soma dos depósitos contra o valor final em reais de hoje.)</span>':''}`;
+
+    drawChart(s,n);
+
+    // Comparação
+    let rows="";
+    for(const t of ["cofre","poup","selic","cdb"]){
+      const x=simulate(t,n,ini,mes,P);
+      const g=x.real[n]-x.dep[n];
+      const gp = x.dep[n]>0 ? g/x.dep[n] : 0;
+      rows+=`<tr class="${t===type?"sel":""}"><td>${NAMES[t]}</td><td>${brl.format(x.net[n])}</td><td>${brl.format(x.gross[n]-x.dep[n])}</td>
+        <td>${taxed(t)?brl.format(x.ir[n]):(t==="poup"?"isenta":"—")}</td><td>${brl.format(x.real[n])}</td>
+        <td class="${gp>=0?"pos":"neg"}">${gp>=0?"+":"−"}${pct(Math.abs(gp),1)}</td></tr>`;
+    }
+    $("cmp").querySelector("tbody").innerHTML=rows;
+
+    // Meta
+    const preco=num($("preco")), item=($("item").value||"isso").trim();
+    if(preco<=0){ $("goalOut").textContent="Coloque o preço de hoje para calcular."; }
+    else{
+      const M=360, g=simulate(type,M,ini,mes,P), gc=simulate("cofre",M,ini,mes,P);
+      const hit = (sim)=>{ for(let m=0;m<=M;m++){ if(m===0){ if(ini>=preco) return 0; continue; } if(sim.net[m]>=preco*Math.pow(1+P.pi,m/12)) return m; } return -1; };
+      const m1=hit(g), m2=hit(gc);
+      const when = m => { const d=new Date(); d.setMonth(d.getMonth()+m); return d.toLocaleDateString("pt-BR",{month:"long",year:"numeric"}); };
+      let txt="";
+      if(m1===0) txt=`Você já tem dinheiro para comprar ${item} hoje.`;
+      else if(m1<0) txt=`Com esse plano, ${item} não fica ao seu alcance em 30 anos: o preço sobe mais rápido do que o dinheiro rende. Aumente o depósito mensal.`;
+      else{
+        txt=`No ${NAMES[type]}, você consegue comprar ${item} no <strong>mês ${m1}</strong> (por volta de ${when(m1)}), quando ele estará custando cerca de ${brl.format(preco*Math.pow(1+P.pi,m1/12))}.`;
+        if(type!=="cofre"){
+          if(m2<0) txt+=` Guardando no cofrinho, você nunca chegaria lá.`;
+          else if(m2>m1) txt+=` No cofrinho, só no mês ${m2}: os juros adiantam a compra em ${m2-m1} ${m2-m1===1?"mês":"meses"}.`;
+          else txt+=` No cofrinho, também no mês ${m2}.`;
+        }
+      }
+      $("goalOut").innerHTML=txt;
+    }
+
+    // Explicações
+    const r=s.r;
+    if(type==="selic") $("expFator").innerHTML=`<p>A Selic é ${pct(P.S)} <em>ao ano</em>. A taxa do mês não é ${pct(P.S)} ÷ 12 = ${pct(P.S/12,3)}, porque os juros de cada mês também rendem. A taxa mensal certa é o número que, multiplicado 12 vezes seguidas, dá o fator anual:</p>
+      <div class="formula">(1 + i)<sup>12</sup> = ${dec(1+P.S)} &nbsp;⇒&nbsp; i = ${dec(1+P.S)}<sup>1/12</sup> − 1 ≈ ${pct(r,3)} ao mês</div>
+      <p>Confira na calculadora: ${dec(1+r,5)}<sup>12</sup> ≈ ${dec(Math.pow(1+r,12))}. Já ${dec(1+P.S/12,5)}<sup>12</sup> ≈ ${dec(Math.pow(1+P.S/12,12))} — <span class="warn">passa do fator anual</span>.</p>`;
+    else if(type==="cdb") $("expFator").innerHTML=`<p>O CDB paga ${pct(P.p,0)} do CDI, que fica perto da Selic (${pct(Math.max(P.S-0.001,0))} ao ano). Convertendo para o mês, o fator mensal é <strong>${dec(1+r,5)}</strong>, ou seja, ${pct(r,3)} ao mês.</p><div class="formula">valor do mês seguinte = valor × ${dec(1+r,5)}</div>`;
+    else if(type==="poup") $("expFator").innerHTML=`<p>Com a Selic ${P.S>0.085?"acima":"abaixo"} de 8,5% ao ano, a poupança rende ${P.S>0.085?"0,5% ao mês":"70% da Selic"} + TR (${pct(P.tr)}). Total: ${pct(r,3)} ao mês, fator <strong>${dec(1+r,5)}</strong>.</p><div class="formula">valor do mês seguinte = valor × ${dec(1+r,5)}</div>`;
+    else $("expFator").innerHTML=`<p>No cofrinho, o fator é <strong>1</strong>: o dinheiro não aumenta nem diminui. Mas os preços aumentam — veja o item 4.</p>`;
+
+    let tb=`<p>Cada depósito entra no começo do mês. No fim do mês, o saldo todo é multiplicado pelo fator ${dec(1+r,5)}.</p><div class="table-scroll"><table style="min-width:420px"><thead><tr><th>Mês</th><th>Conta</th><th>Saldo bruto</th></tr></thead><tbody>`;
+    let b=0;
+    for(let m=1;m<=Math.min(3,n);m++){ const a=(m===1?ini:0)+mes; const prev=b; b=(b+a)*(1+r);
+      tb+=`<tr><td>${m}</td><td>(${brl.format(prev)} + ${brl.format(a)}) × ${dec(1+r,5)}</td><td>${brl.format(b)}</td></tr>`; }
+    tb+=`</tbody></table></div><p>Só com o depósito inicial, sem os mensais, seria a fórmula do livro: <span class="formula" style="display:inline-block;padding:2px 10px;margin:4px 0">M = C · (1 + i)<sup>t</sup> = ${brl.format(ini)} · ${dec(1+r,5)}<sup>${n}</sup> = ${brl.format(ini*Math.pow(1+r,n))}</span></p>`;
+    $("expMeses").innerHTML=tb;
+
+    if(taxed(type)) $("expIR").innerHTML=`<p>O imposto é cobrado só sobre o que <em>rendeu</em>, nunca sobre o que você depositou. E a alíquota depende de quanto tempo cada depósito ficou aplicado:</p>
+      <div class="formula">até 180 dias: 22,5% &nbsp;·&nbsp; até 360: 20% &nbsp;·&nbsp; até 720: 17,5% &nbsp;·&nbsp; mais de 720: 15%</div>
+      <p>No seu plano, os juros brutos foram ${brl.format(juros)} e o imposto total ficou em ${brl.format(ir)}, ou seja, ${juros>0?pct(ir/juros,1):"0%"} dos juros.
+      ${mes>0?"Os depósitos mais recentes pagam alíquota maior, porque ficaram menos tempo.":""}</p>`;
+    else $("expIR").innerHTML= type==="poup" ? `<p>A poupança não paga Imposto de Renda. É por isso que ela às vezes chega perto do Tesouro, mesmo rendendo menos por mês.</p>` : `<p>Sem rendimento, não há imposto.</p>`;
+
+    $("expReal").innerHTML=`<p>Para saber o que o dinheiro compra, divida pelo fator acumulado da inflação (aumentos sucessivos, igual à Seção 3 do guia):</p>
+      <div class="formula">${brl.format(net)} ÷ ${dec(1+P.pi)}<sup>${dec(n/12,2)}</sup> = ${brl.format(net)} ÷ ${dec(priceFactor)} = ${brl.format(real)}</div>
+      <p>Taxa real em um ano, sem imposto: (1 + ${pct(r===0?0:Math.pow(1+r,12)-1)}) ÷ (1 + ${pct(P.pi)}) − 1 = <strong>${pct((Math.pow(1+r,12))/(1+P.pi)-1)}</strong>.
+      Subtrair as taxas daria ${pct(Math.pow(1+r,12)-1-P.pi)} — parecido, mas errado.</p>`;
+
+    const ra=Math.pow(1+r,12)-1;
+    if(ra>0){ const exact=Math.log(2)/Math.log(1+ra);
+      $("expDobra").innerHTML=`<p><strong>Regra do 72:</strong> divida 72 pela taxa anual. Aqui, 72 ÷ ${dec(ra*100,2)} ≈ <strong>${dec(72/(ra*100),1)} anos</strong>.
+      A conta exata (sem imposto) dá ${dec(exact,1)} anos.</p><p>A regra funciona para qualquer coisa que cresça a uma taxa fixa — inclusive dívidas. Um cartão de crédito a 12% ao mês dobra a dívida em cerca de 6 meses.</p>`; }
+    else $("expDobra").innerHTML=`<p>No cofrinho, o dinheiro nunca dobra. Já os preços, com inflação de ${pct(P.pi)} ao ano, dobram em cerca de ${P.pi>0?dec(72/(P.pi*100),0):"∞"} anos (72 ÷ ${dec(P.pi*100,2)}).</p>`;
+  }
+
+  function syncOutputs(){
+    $("oSelic").textContent=pct(num($("selic"))/100);
+    $("oIpca").textContent=pct(num($("ipca"))/100);
+    $("oPcdi").textContent=num($("pcdi")).toFixed(0)+"%";
+    $("oTr").textContent=pct(num($("tr"))/100);
+  }
+  ["ini","mes","prazo","tipo","selic","ipca","pcdi","tr","preco","item"].forEach(id=>{
+    $(id).addEventListener("input",()=>{ syncOutputs(); render(); });
+  });
+  $("reset").addEventListener("click",()=>{ for(const k in DEF) $(k).value=DEF[k]; syncOutputs(); render(); });
+  if(window.matchMedia) window.matchMedia("(prefers-color-scheme: dark)").addEventListener?.("change",()=>{ if(chart){chart.destroy();chart=null;} render(); });
+  syncOutputs(); render();
+})();
+</script>
+<script src="../../assets/voltar.js" defer></script>
+</body>
+</html>

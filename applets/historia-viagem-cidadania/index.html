@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Viagem no tempo da cidadania</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  color-scheme: light;
+  --bg:#EAF3FF; --paper:#FFFFFF; --ink:#1E2A4A; --soft:#56648A; --line:#D0DCF2;
+  --primary:#3346A8; --primary-ink:#FFFFFF; --gold:#C98A00;
+  --mint:#21A58C; --coral:#E5534E; --good-bg:#DDF6EF; --bad-bg:#FDE3E2;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme: dark;
+    --bg:#111833; --paper:#1C2549; --ink:#EEF2FF; --soft:#AEB8DA; --line:#2F3B6B;
+    --primary:#93A3FF; --primary-ink:#111833; --gold:#FFC23D;
+    --mint:#45CDB2; --coral:#FF7C77; --good-bg:#15443B; --bad-bg:#4B2332;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme: dark;
+  --bg:#111833; --paper:#1C2549; --ink:#EEF2FF; --soft:#AEB8DA; --line:#2F3B6B;
+  --primary:#93A3FF; --primary-ink:#111833; --gold:#FFC23D;
+  --mint:#45CDB2; --coral:#FF7C77; --good-bg:#15443B; --bad-bg:#4B2332;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px);height:100%}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 17px/1.55 Nunito,"Trebuchet MS",system-ui,sans-serif;-webkit-text-size-adjust:100%}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+h1,h2,h3{font-family:"Baloo 2","Trebuchet MS",system-ui,sans-serif;line-height:1.08;margin:0;font-weight:800}
+button{font:inherit}
+:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
+[hidden]{display:none!important}
+
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-bottom:2px solid var(--line)}
+.top-in{max-width:680px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 16px;min-height:60px}
+.brand{font-family:"Baloo 2",system-ui,sans-serif;font-weight:800;font-size:19px}
+.score{font-weight:800;font-size:18px;color:var(--ink);background:var(--paper);border-radius:999px;padding:6px 14px;white-space:nowrap}
+.score span{color:var(--gold)}
+.back{background:var(--paper);color:var(--ink);border:2px solid var(--line);border-radius:999px;padding:8px 16px;font-weight:800;cursor:pointer;min-height:44px}
+
+main{max-width:680px;margin:0 auto;padding:16px 16px 56px}
+.btn{border:0;border-radius:16px;padding:14px 18px;background:var(--primary);color:var(--primary-ink);font-weight:800;font-size:17px;cursor:pointer;min-height:52px}
+.btn.ghost{background:transparent;color:var(--primary);box-shadow:inset 0 0 0 2px var(--primary)}
+.btn:disabled{opacity:.4;cursor:default}
+
+/* Início */
+.hero{border-radius:28px;overflow:hidden;line-height:0}
+.hero svg{width:100%;height:auto;display:block}
+.home h1{font-size:clamp(32px,8.5vw,48px);margin:20px 0 8px}
+.lead{color:var(--soft);margin:0 0 22px;max-width:36em}
+.doors{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.door{all:unset;box-sizing:border-box;cursor:pointer;border-radius:22px;padding:16px;color:#1E2A4A;display:flex;flex-direction:column;gap:6px;min-height:168px;position:relative}
+.door:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
+.door.wide{grid-column:1/-1;flex-direction:row;align-items:center;gap:14px;min-height:0}
+.door .ic{line-height:0}
+.door .ic svg{width:56px;height:56px}
+.door b{font-family:"Baloo 2",system-ui,sans-serif;font-size:22px;line-height:1.05}
+.door small{font-size:15px;line-height:1.35}
+.door .st{margin-top:auto;font-weight:800;font-size:15px}
+.d1{background:#FFC94F}.d2{background:#8ADBC8}.d3{background:#FFB8B2}.d4{background:#BFC9FF}.d5{background:#FFDDA6}
+
+/* Paradas */
+.dots{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 14px}
+.dot{width:38px;height:38px;border-radius:50%;border:2px solid var(--line);background:var(--paper);color:var(--ink);font-weight:800;font-size:15px;cursor:pointer}
+.dot.done{background:var(--mint);border-color:var(--mint);color:#fff}
+.dot.cur{box-shadow:0 0 0 3px var(--primary)}
+.art{border-radius:24px;overflow:hidden;line-height:0}
+.art svg{width:100%;height:auto;display:block}
+.era{display:inline-block;margin:16px 0 6px;padding:4px 12px;border-radius:999px;background:var(--paper);color:var(--soft);font-weight:800;font-size:14px}
+.stop h2{font-size:clamp(28px,7vw,36px);margin:2px 0 14px}
+.facts{list-style:none;padding:0;margin:0 0 14px;display:grid;gap:10px}
+.facts li{background:var(--paper);border-radius:16px;padding:12px 14px 12px 46px;position:relative}
+.facts li::before{content:"";position:absolute;left:16px;top:17px;width:16px;height:16px;border-radius:5px;transform:rotate(45deg);background:var(--c,#FFC94F)}
+.key{background:#FFC94F;color:#1E2A4A;border-radius:16px;padding:12px 16px;font-weight:800;margin:0}
+.check{margin-top:18px;border:3px dashed var(--line);border-radius:20px;padding:16px}
+.check h3{font-size:22px;margin-bottom:4px}
+.check p.q{margin:0 0 12px;font-weight:700}
+.opts{display:grid;gap:8px}
+.opt{text-align:left;background:var(--paper);color:var(--ink);border:2px solid var(--line);border-radius:16px;padding:12px 16px;font-weight:700;font-size:17px;line-height:1.35;cursor:pointer;min-height:52px}
+.opt:disabled{cursor:default}
+.opt.ok{background:var(--good-bg);border-color:var(--mint)}
+.opt.no{background:var(--bad-bg);border-color:var(--coral)}
+.fb{min-height:1.5em;margin:10px 0 0;font-weight:800}
+.fb.good{color:var(--mint)}.fb.bad{color:var(--coral)}
+.nav{display:flex;gap:10px;margin-top:20px}.nav .btn{flex:1}
+
+/* Jogos */
+.gamehead h2{font-size:clamp(28px,7vw,36px)}
+.gamehead p{color:var(--soft);margin:4px 0 0}
+.bar{height:14px;border-radius:999px;background:var(--line);overflow:hidden;margin:12px 0 16px}
+.bar i{display:block;height:100%;background:var(--mint);width:0;transition:width .35s}
+.qcard{background:var(--paper);border-radius:24px;padding:18px}
+.qcard .count{color:var(--soft);font-weight:800;font-size:14px;margin:0 0 6px}
+.qcard h3{font-size:24px;margin-bottom:14px;line-height:1.15}
+.qcard .opt{background:var(--bg)}
+.qcard .opt.ok{background:var(--good-bg)}.qcard .opt.no{background:var(--bad-bg)}
+.explain{margin:12px 0 0;padding:12px 14px;border-radius:14px;background:var(--bg)}
+.explain b{display:block;font-family:"Baloo 2",system-ui,sans-serif;font-size:20px}
+.result{text-align:center;background:var(--paper);border-radius:28px;padding:28px 18px}
+.result h2{font-size:34px}
+.big-stars{font-size:60px;letter-spacing:8px;color:var(--gold);margin:6px 0;line-height:1.1}
+.big-stars span{display:inline-block;animation:pop .5s backwards}
+.big-stars span:nth-child(2){animation-delay:.15s}.big-stars span:nth-child(3){animation-delay:.3s}
+.big-stars span.off{color:var(--line)}
+@keyframes pop{from{transform:scale(0) rotate(-50deg)}}
+.result .row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:16px}
+.review{text-align:left;margin:18px 0 0;padding:0;list-style:none;display:grid;gap:8px}
+.review li{background:var(--bg);border-radius:14px;padding:10px 14px;font-size:15px}
+.shake{animation:shake .35s}
+@keyframes shake{20%{transform:translateX(-7px)}60%{transform:translateX(7px)}}
+
+.item-card{font-family:"Baloo 2",system-ui,sans-serif;font-weight:800;font-size:clamp(26px,7vw,34px);text-align:center;background:var(--paper);border-radius:24px;padding:30px 16px;margin-bottom:14px;line-height:1.1}
+.buckets{display:grid;gap:10px}
+.bucket{all:unset;box-sizing:border-box;cursor:pointer;border-radius:18px;padding:12px 16px;color:#1E2A4A;display:flex;align-items:center;gap:12px;min-height:64px}
+.bucket:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
+.bucket svg{width:42px;height:42px;flex:none}
+.bucket b{font-family:"Baloo 2",system-ui,sans-serif;font-size:21px;display:block;line-height:1.1}
+.bucket small{font-size:14px}
+.b-civil{background:#BFC9FF}.b-politico{background:#FFC94F}.b-social{background:#FFB8B2}
+
+.tl{list-style:none;padding:0 0 0 24px;margin:0 0 18px 10px;border-left:4px solid var(--primary);min-height:20px}
+.tl li{position:relative;margin:0 0 10px;background:var(--paper);border-radius:14px;padding:8px 12px;animation:slidein .3s}
+.tl li::before{content:"";position:absolute;left:-35px;top:14px;width:18px;height:18px;border-radius:50%;background:var(--primary);border:4px solid var(--bg)}
+.tl li b{font-family:"Baloo 2",system-ui,sans-serif;color:var(--primary);font-size:20px;margin-right:6px}
+@keyframes slidein{from{opacity:0;transform:translateY(-8px)}}
+.pool{display:grid;gap:8px}
+.hint{color:var(--soft);font-weight:700;margin:0 0 10px}
+
+.who{display:flex;gap:14px;align-items:flex-start;margin-bottom:14px}
+.who svg{width:64px;height:64px;flex:none}
+.who p{margin:0;font-family:"Baloo 2",system-ui,sans-serif;font-weight:600;font-size:21px;line-height:1.25}
+
+@media (max-width:380px){.doors{grid-template-columns:1fr}.door{min-height:0}}
+@media (prefers-reduced-motion: reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="top-in">
+    <button class="back" id="home-btn" type="button" hidden>Início</button>
+    <span class="brand" id="brand">Viagem no tempo</span>
+    <span class="score" aria-live="polite"><span>★</span> <b id="total">0</b></span>
+  </div>
+</header>
+
+<main>
+  <section data-view="inicio" class="home" id="v-inicio"></section>
+  <section data-view="paradas" id="v-paradas" hidden></section>
+  <section data-view="quiz" id="v-quiz" hidden></section>
+  <section data-view="separar" id="v-separar" hidden></section>
+  <section data-view="linha" id="v-linha" hidden></section>
+  <section data-view="quem" id="v-quem" hidden></section>
+</main>
+
+<script>
+/* ---------- Ilustrações ---------- */
+const F = 'font-family="Baloo 2,Trebuchet MS,sans-serif" font-weight="800"';
+const ART = {
+hero: `<svg viewBox="0 0 320 200" role="img" aria-label="Uma máquina do tempo voando entre uma coluna grega, um pergaminho e um navio">
+<defs><linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2A3A8E"/><stop offset="1" stop-color="#5468D8"/></linearGradient></defs>
+<rect width="320" height="200" fill="url(#sky)"/>
+<g fill="#fff"><circle cx="24" cy="22" r="2"/><circle cx="120" cy="16" r="1.6"/><circle cx="300" cy="28" r="2"/><circle cx="160" cy="44" r="1.4"/><circle cx="34" cy="96" r="1.5"/><circle cx="292" cy="120" r="1.6"/><circle cx="250" cy="186" r="1.5"/></g>
+<g stroke-linecap="round" stroke-width="12" fill="none"><path d="M-10 78 C60 70 100 96 150 92" stroke="#FFC94F"/><path d="M-10 102 C60 98 100 112 148 108" stroke="#8ADBC8"/><path d="M-10 126 C60 126 100 128 152 124" stroke="#FFB8B2"/></g>
+<g transform="translate(206 104)">
+<path d="M-40 44 L-64 66 L-28 56Z" fill="#E5534E"/><path d="M40 44 L64 66 L28 56Z" fill="#E5534E"/>
+<circle r="60" fill="#FFC94F" stroke="#1E2A4A" stroke-width="5"/>
+<circle r="38" fill="#fff" stroke="#1E2A4A" stroke-width="5"/>
+<g stroke="#1E2A4A" stroke-width="4" stroke-linecap="round"><line y1="-30" y2="-24"/><line y1="24" y2="30"/><line x1="-30" x2="-24"/><line x1="24" x2="30"/></g>
+<line x2="0" y2="-22" stroke="#3346A8" stroke-width="5" stroke-linecap="round"/><line x2="16" y2="8" stroke="#E5534E" stroke-width="5" stroke-linecap="round"/>
+<circle r="5" fill="#1E2A4A"/>
+<circle cx="-44" cy="-30" r="5" fill="#fff"/><circle cx="46" cy="-26" r="5" fill="#fff"/>
+</g>
+<g transform="translate(46 20)"><rect x="0" y="0" width="34" height="7" fill="#fff"/><rect x="5" y="7" width="24" height="40" fill="#E9EEFF"/><g stroke="#B8C2EA" stroke-width="2"><line x1="11" y1="9" x2="11" y2="45"/><line x1="17" y1="9" x2="17" y2="45"/><line x1="23" y1="9" x2="23" y2="45"/></g><rect x="-2" y="47" width="38" height="7" fill="#fff"/></g>
+<g transform="translate(40 150) rotate(-8)"><rect width="60" height="34" rx="4" fill="#FFF3CC"/><rect x="-5" y="-4" width="70" height="8" rx="4" fill="#E9C46A"/><rect x="-5" y="30" width="70" height="8" rx="4" fill="#E9C46A"/><g stroke="#C9A24A" stroke-width="3" stroke-linecap="round"><line x1="10" y1="12" x2="50" y2="12"/><line x1="10" y1="21" x2="40" y2="21"/></g></g>
+<g transform="translate(258 30)"><path d="M0 22 H48 L40 34 H8Z" fill="#fff"/><rect x="14" y="10" width="20" height="12" fill="#E9EEFF"/><rect x="22" y="0" width="5" height="10" fill="#E9EEFF"/></g>
+</svg>`,
+
+cidadania: `<svg viewBox="0 0 320 180" role="img" aria-label="Três símbolos: um balão de fala para direitos civis, uma urna para direitos políticos e um livro com coração para direitos sociais">
+<rect width="320" height="180" fill="#CFE5FF"/><rect y="146" width="320" height="34" fill="#A8DCC0"/>
+<g transform="translate(28 34)"><rect width="78" height="56" rx="16" fill="#fff" stroke="#3346A8" stroke-width="4"/><path d="M20 54 L14 76 L38 56" fill="#fff" stroke="#3346A8" stroke-width="4" stroke-linejoin="round"/><circle cx="23" cy="28" r="6" fill="#3346A8"/><circle cx="39" cy="28" r="6" fill="#3346A8"/><circle cx="55" cy="28" r="6" fill="#3346A8"/></g>
+<g transform="translate(122 34)"><rect x="24" y="0" width="30" height="46" rx="3" fill="#fff" stroke="#1E2A4A" stroke-width="4"/><path d="M31 22 l7 8 l11 -15" fill="none" stroke="#21A58C" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><rect x="0" y="36" width="78" height="62" rx="8" fill="#FFC94F" stroke="#1E2A4A" stroke-width="4"/><rect x="17" y="46" width="44" height="9" rx="4.5" fill="#1E2A4A"/></g>
+<g transform="translate(214 58)"><path d="M38 -22 c-8 -14 -26 -4 -16 10 l16 14 l16 -14 c10 -14 -8 -24 -16 -10z" fill="#E5534E"/><path d="M0 10 Q19 0 38 10 Q57 0 76 10 V72 Q57 62 38 72 Q19 62 0 72Z" fill="#fff" stroke="#E5534E" stroke-width="4" stroke-linejoin="round"/><line x1="38" y1="10" x2="38" y2="72" stroke="#E5534E" stroke-width="4"/></g>
+<g ${F} font-size="17" fill="#1E2A4A" text-anchor="middle"><text x="67" y="170">civis</text><text x="161" y="170">políticos</text><text x="252" y="170">sociais</text></g>
+</svg>`,
+
+atenas: `<svg viewBox="0 0 320 180" role="img" aria-label="Templo grego com colunas, sol e um vaso de cerâmica">
+<rect width="320" height="180" fill="#FFE7B8"/><circle cx="276" cy="36" r="22" fill="#FFC23D"/><rect y="150" width="320" height="30" fill="#E6C58A"/>
+<g fill="#fff" stroke="#3346A8" stroke-width="3" stroke-linejoin="round">
+<polygon points="72,60 160,24 248,60"/><rect x="66" y="60" width="188" height="12"/>
+<rect x="82" y="72" width="16" height="56"/><rect x="117" y="72" width="16" height="56"/><rect x="152" y="72" width="16" height="56"/><rect x="187" y="72" width="16" height="56"/><rect x="222" y="72" width="16" height="56"/>
+<rect x="60" y="128" width="200" height="10"/><rect x="50" y="138" width="220" height="12"/></g>
+<circle cx="160" cy="48" r="6" fill="#FFC23D"/>
+<g transform="translate(18 104)"><path d="M10 46 q-10 -18 2 -32 q-4 -6 0 -12 h16 q4 6 0 12 q12 14 2 32z" fill="#C8643B"/><rect x="5" y="22" width="26" height="6" fill="#1E2A4A"/></g>
+<g transform="translate(276 112)"><circle cx="0" cy="0" r="7" fill="#1E2A4A"/><rect x="-7" y="7" width="14" height="24" rx="5" fill="#3346A8"/><circle cx="20" cy="4" r="7" fill="#1E2A4A"/><rect x="13" y="11" width="14" height="20" rx="5" fill="#E5534E"/></g>
+</svg>`,
+
+roma: `<svg viewBox="0 0 320 180" role="img" aria-label="Arco romano em ruínas e o escudo vermelho de um legionário">
+<rect width="320" height="180" fill="#F9DEC9"/><rect y="148" width="320" height="32" fill="#DDB58C"/>
+<g fill="#EFD6B2" stroke="#8A5A3C" stroke-width="3" stroke-linejoin="round">
+<rect x="32" y="56" width="128" height="16"/><path d="M40 148 V72 H152 V148 H126 V112 A30 30 0 0 0 66 112 V148Z"/>
+<rect x="172" y="88" width="16" height="60"/><rect x="168" y="80" width="24" height="9"/><path d="M196 148 V110 l8 -6 l8 6 V148Z"/></g>
+<g transform="translate(222 46)"><rect width="66" height="98" rx="12" fill="#C0392B" stroke="#7A1E15" stroke-width="4"/>
+<g stroke="#FFC23D" stroke-width="5" stroke-linecap="round"><line x1="33" y1="10" x2="33" y2="38"/><line x1="33" y1="60" x2="33" y2="88"/><line x1="8" y1="49" x2="20" y2="49"/><line x1="46" y1="49" x2="58" y2="49"/></g>
+<circle cx="33" cy="49" r="11" fill="#FFC23D"/></g>
+</svg>`,
+
+escravidao: `<svg viewBox="0 0 320 180" role="img" aria-label="Uma corrente quebrada e um pássaro voando livre">
+<rect width="320" height="180" fill="#DCEBFF"/><rect y="146" width="320" height="34" fill="#A8DCC0"/>
+<g fill="none" stroke="#6E7894" stroke-width="10" stroke-linecap="round">
+<ellipse cx="58" cy="104" rx="30" ry="17" transform="rotate(-12 58 104)"/>
+<ellipse cx="104" cy="96" rx="30" ry="17" transform="rotate(-12 104 96)"/>
+<path d="M150 82 a28 16 -12 0 0 -14 26"/><path d="M196 74 a28 16 -12 0 1 12 26"/>
+<ellipse cx="250" cy="66" rx="30" ry="17" transform="rotate(-12 250 66)"/></g>
+<g stroke="#FFC23D" stroke-width="5" stroke-linecap="round"><line x1="168" y1="60" x2="166" y2="44"/><line x1="182" y1="104" x2="192" y2="118"/><line x1="160" y1="114" x2="150" y2="128"/><line x1="186" y1="64" x2="198" y2="52"/></g>
+<path d="M226 128 q12 -14 24 0 q12 -14 24 0" fill="none" stroke="#3346A8" stroke-width="5" stroke-linecap="round"/>
+<path d="M248 30 q8 -10 16 0 q8 -10 16 0" fill="none" stroke="#3346A8" stroke-width="4" stroke-linecap="round"/>
+</svg>`,
+
+onu: `<svg viewBox="0 0 320 180" role="img" aria-label="Globo terrestre entre ramos de oliveira, símbolo da paz">
+<rect width="320" height="180" fill="#D5EBFF"/>
+<circle cx="160" cy="84" r="54" fill="#4C9BE0" stroke="#fff" stroke-width="5"/>
+<path d="M128 52 q16 -8 26 4 q-6 14 6 22 q-14 10 -26 0 q-12 -10 -6 -26z M170 92 q18 -6 26 10 q-8 18 -22 20 q-10 -14 -4 -30z M176 44 q14 0 18 12 q-12 4 -18 -12z" fill="#7FD3A6"/>
+<g fill="none" stroke="#fff" stroke-width="2" opacity=".7"><ellipse cx="160" cy="84" rx="22" ry="54"/><line x1="106" y1="84" x2="214" y2="84"/></g>
+<g fill="#21A58C">
+<ellipse cx="94" cy="120" rx="12" ry="6" transform="rotate(-50 94 120)"/><ellipse cx="86" cy="98" rx="12" ry="6" transform="rotate(-75 86 98)"/><ellipse cx="88" cy="74" rx="12" ry="6" transform="rotate(-100 88 74)"/><ellipse cx="98" cy="52" rx="12" ry="6" transform="rotate(-125 98 52)"/>
+<ellipse cx="226" cy="120" rx="12" ry="6" transform="rotate(50 226 120)"/><ellipse cx="234" cy="98" rx="12" ry="6" transform="rotate(75 234 98)"/><ellipse cx="232" cy="74" rx="12" ry="6" transform="rotate(100 232 74)"/><ellipse cx="222" cy="52" rx="12" ry="6" transform="rotate(125 222 52)"/></g>
+<rect x="112" y="146" width="96" height="26" rx="13" fill="#3346A8"/><text x="160" y="165" ${F} font-size="17" fill="#fff" text-anchor="middle">1945 e 1948</text>
+</svg>`,
+
+franca: `<svg viewBox="0 0 320 180" role="img" aria-label="Pirâmide da sociedade francesa: primeiro estado no topo, segundo no meio e terceiro estado, o povo, na base larga">
+<rect width="320" height="180" fill="#FFF0E0"/>
+<polygon points="168,22 135,66 201,66" fill="#8E7CC3"/>
+<polygon points="135,66 104,108 232,108 201,66" fill="#F2C14E"/>
+<polygon points="104,108 66,160 270,160 232,108" fill="#5DA9E9"/>
+<g ${F} text-anchor="middle" fill="#1E2A4A"><text x="168" y="58" font-size="14" fill="#fff">1º</text><text x="168" y="93" font-size="15">2º nobreza</text><text x="168" y="141" font-size="17">3º estado: o povo</text></g>
+<text x="210" y="44" ${F} font-size="13" fill="#5B4A99">clero</text>
+<g transform="translate(18 34)"><rect x="0" y="0" width="4" height="120" fill="#6E5A3C"/><rect x="4" y="2" width="14" height="30" fill="#2E4FA3"/><rect x="18" y="2" width="14" height="30" fill="#fff"/><rect x="32" y="2" width="14" height="30" fill="#E0403A"/></g>
+</svg>`,
+
+haiti: `<svg viewBox="0 0 320 180" role="img" aria-label="Ilha no mar do Caribe com palmeira, sol e uma corrente partida">
+<rect width="320" height="180" fill="#BFE5FF"/><circle cx="60" cy="40" r="22" fill="#FFC23D"/><rect y="112" width="320" height="68" fill="#3E8FD8"/>
+<g stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round" opacity=".7"><path d="M20 150 q10 -6 20 0 q10 6 20 0"/><path d="M250 160 q10 -6 20 0 q10 6 20 0"/></g>
+<ellipse cx="170" cy="120" rx="112" ry="22" fill="#F3D58A"/>
+<path d="M150 118 q-4 -40 12 -76" stroke="#8A5A3C" stroke-width="8" fill="none" stroke-linecap="round"/>
+<g fill="#21A58C"><path d="M162 42 q-30 -10 -48 10 q24 -4 48 -10z"/><path d="M162 42 q26 -18 50 0 q-26 -2 -50 0z"/><path d="M162 42 q-12 -22 -36 -24 q16 12 36 24z"/><path d="M162 42 q20 6 30 28 q-18 -14 -30 -28z"/></g>
+<g fill="none" stroke="#6E7894" stroke-width="6" stroke-linecap="round"><path d="M196 116 a12 7 0 1 1 18 -6"/><path d="M226 104 a12 7 0 1 1 14 8"/></g>
+<g transform="translate(262 52)"><rect x="0" y="0" width="4" height="66" fill="#6E5A3C"/><rect x="4" y="2" width="36" height="12" fill="#00209F"/><rect x="4" y="14" width="36" height="12" fill="#D21034"/></g>
+</svg>`,
+
+brasil: `<svg viewBox="0 0 320 180" role="img" aria-label="Pergaminho da Lei Áurea com a data 13 de maio de 1888 e uma pena de escrever">
+<rect width="320" height="180" fill="#E5F6EA"/>
+<rect x="70" y="32" width="180" height="118" fill="#FFF6D8" stroke="#B8892E" stroke-width="3"/>
+<rect x="60" y="22" width="200" height="16" rx="8" fill="#E9C46A" stroke="#B8892E" stroke-width="3"/><rect x="60" y="144" width="200" height="16" rx="8" fill="#E9C46A" stroke="#B8892E" stroke-width="3"/>
+<g ${F} text-anchor="middle" fill="#7A4E12"><text x="160" y="70" font-size="24">Lei Áurea</text><text x="160" y="94" font-size="16">13 de maio de 1888</text></g>
+<g stroke="#D4B26A" stroke-width="3" stroke-linecap="round"><line x1="96" y1="112" x2="224" y2="112"/><line x1="96" y1="126" x2="190" y2="126"/></g>
+<g transform="translate(242 60) rotate(30)"><path d="M0 0 q22 30 6 86 q-26 -34 -6 -86z" fill="#fff" stroke="#3346A8" stroke-width="3"/><line x1="3" y1="10" x2="6" y2="100" stroke="#3346A8" stroke-width="3"/></g>
+</svg>`,
+
+chibata: `<svg viewBox="0 0 320 180" role="img" aria-label="Navio de guerra no mar, como os tomados pelos marinheiros em 1910">
+<rect width="320" height="180" fill="#CFE6FF"/><rect y="122" width="320" height="58" fill="#2E6FB7"/>
+<path d="M36 112 H286 L264 140 H58Z" fill="#4A5266"/>
+<rect x="96" y="88" width="120" height="24" fill="#6B7590"/><rect x="128" y="66" width="56" height="22" fill="#8792AE"/>
+<rect x="110" y="62" width="14" height="26" fill="#3A4152"/><rect x="190" y="62" width="14" height="26" fill="#3A4152"/>
+<g fill="#3A4152"><rect x="62" y="100" width="34" height="6"/><rect x="216" y="100" width="40" height="6"/></g>
+<line x1="156" y1="66" x2="156" y2="30" stroke="#3A4152" stroke-width="4"/><path d="M156 30 h30 l-6 8 l6 8 h-30z" fill="#E5534E"/>
+<g fill="#fff"><circle cx="120" cy="100" r="4"/><circle cx="140" cy="100" r="4"/><circle cx="160" cy="100" r="4"/><circle cx="180" cy="100" r="4"/><circle cx="200" cy="100" r="4"/></g>
+<g stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round" opacity=".7"><path d="M20 154 q12 -7 24 0 q12 7 24 0"/><path d="M200 164 q12 -7 24 0 q12 7 24 0"/><path d="M110 150 q12 -7 24 0"/></g>
+<circle cx="70" cy="44" r="6" fill="#B9C2D6"/><circle cx="82" cy="36" r="8" fill="#B9C2D6"/>
+</svg>`,
+
+segregacao: `<svg viewBox="0 0 320 180" role="img" aria-label="Ônibus amarelo de 1955, símbolo do protesto de Montgomery">
+<rect width="320" height="180" fill="#FFE8D4"/><rect y="142" width="320" height="38" fill="#6B6F7A"/>
+<g stroke="#fff" stroke-width="4" stroke-dasharray="20 16"><line x1="0" y1="162" x2="320" y2="162"/></g>
+<rect x="36" y="54" width="248" height="84" rx="16" fill="#F5B83D" stroke="#1E2A4A" stroke-width="4"/>
+<rect x="36" y="112" width="248" height="10" fill="#1E2A4A"/>
+<g fill="#CFE8FF" stroke="#1E2A4A" stroke-width="3"><rect x="52" y="66" width="34" height="30" rx="4"/><rect x="94" y="66" width="34" height="30" rx="4"/><rect x="136" y="66" width="34" height="30" rx="4"/><rect x="178" y="66" width="34" height="30" rx="4"/><rect x="226" y="66" width="44" height="56" rx="4"/></g>
+<circle cx="152" cy="80" r="6" fill="#5A3A2A"/><rect x="146" y="86" width="12" height="10" rx="3" fill="#2BB39A"/>
+<g fill="#1E2A4A"><circle cx="86" cy="140" r="16"/><circle cx="236" cy="140" r="16"/></g><g fill="#B9C2D6"><circle cx="86" cy="140" r="6"/><circle cx="236" cy="140" r="6"/></g>
+<rect x="78" y="28" width="164" height="24" rx="6" fill="#1E2A4A"/><text x="160" y="47" ${F} font-size="15" fill="#FFC94F" text-anchor="middle">Montgomery 1955</text>
+</svg>`
+};
+
+const ICON = {
+paradas:`<svg viewBox="0 0 56 56"><circle cx="28" cy="28" r="24" fill="#fff"/><circle cx="28" cy="28" r="17" fill="none" stroke="#1E2A4A" stroke-width="4"/><path d="M28 17v11l8 5" stroke="#3346A8" stroke-width="4" fill="none" stroke-linecap="round"/></svg>`,
+quiz:`<svg viewBox="0 0 56 56"><circle cx="28" cy="28" r="24" fill="#fff"/><text x="28" y="39" text-anchor="middle" ${F} font-size="32" fill="#21A58C">?</text></svg>`,
+separar:`<svg viewBox="0 0 56 56"><circle cx="28" cy="28" r="24" fill="#fff"/><rect x="11" y="24" width="10" height="16" rx="3" fill="#3346A8"/><rect x="23" y="18" width="10" height="22" rx="3" fill="#FFC23D"/><rect x="35" y="28" width="10" height="12" rx="3" fill="#E5534E"/></svg>`,
+linha:`<svg viewBox="0 0 56 56"><circle cx="28" cy="28" r="24" fill="#fff"/><line x1="12" y1="28" x2="44" y2="28" stroke="#1E2A4A" stroke-width="4" stroke-linecap="round"/><circle cx="16" cy="28" r="5" fill="#3346A8"/><circle cx="28" cy="28" r="5" fill="#21A58C"/><circle cx="40" cy="28" r="5" fill="#E5534E"/></svg>`,
+quem:`<svg viewBox="0 0 56 56"><circle cx="28" cy="28" r="24" fill="#fff"/><circle cx="28" cy="22" r="8" fill="#1E2A4A"/><path d="M14 44 q14 -18 28 0z" fill="#1E2A4A"/></svg>`,
+mystery:`<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="30" fill="#BFC9FF"/><circle cx="32" cy="26" r="11" fill="#1E2A4A"/><path d="M12 54 q20 -24 40 0z" fill="#1E2A4A"/><circle cx="50" cy="14" r="11" fill="#FFC94F"/><text x="50" y="20" text-anchor="middle" ${F} font-size="16" fill="#1E2A4A">?</text></svg>`,
+civil:`<svg viewBox="0 0 42 42"><rect x="3" y="5" width="36" height="25" rx="8" fill="#fff"/><path d="M10 29 l-2 9 l10 -8" fill="#fff"/><circle cx="13" cy="17" r="3" fill="#3346A8"/><circle cx="21" cy="17" r="3" fill="#3346A8"/><circle cx="29" cy="17" r="3" fill="#3346A8"/></svg>`,
+politico:`<svg viewBox="0 0 42 42"><rect x="14" y="4" width="14" height="18" fill="#fff"/><rect x="4" y="18" width="34" height="20" rx="4" fill="#1E2A4A"/><rect x="12" y="22" width="18" height="4" rx="2" fill="#FFC94F"/></svg>`,
+social:`<svg viewBox="0 0 42 42"><path d="M21 37 L6 22 c-6 -8 4 -18 15 -9 c11 -9 21 1 15 9z" fill="#fff"/><path d="M15 22h12M21 16v12" stroke="#E5534E" stroke-width="4" stroke-linecap="round"/></svg>`
+};
+
+/* ---------- Conteúdo ---------- */
+const STOPS = [
+{id:'cidadania', c:'#3346A8', era:'Hoje', title:'O que é cidadania?', art:'cidadania',
+ facts:['Cidadania é o conjunto de direitos e deveres de uma pessoa no país onde ela vive.',
+  'Direitos civis garantem a liberdade: ir e vir, falar o que pensa, escolher a religião, ter justiça.',
+  'Direitos políticos garantem a participação: votar, ser candidato, entrar num partido.',
+  'Direitos sociais são o Estado cuidando das pessoas: escola, saúde, comida, moradia, trabalho, lazer.',
+  'No Brasil, eles estão na Constituição de 1988 e em estatutos, como o ECA (1990), que protege crianças e adolescentes.'],
+ key:'Truque: civil é liberdade, político é voto, social é cuidado.',
+ q:'Estudar numa escola pública é um direito…', opts:['social','civil','político']},
+{id:'atenas', c:'#FFC23D', era:'Grécia Antiga, há mais de 2.500 anos', title:'Atenas: onde a cidadania nasceu', art:'atenas',
+ facts:['As primeiras ideias de cidadania e a democracia surgiram em Atenas.',
+  'Só eram cidadãos os homens livres nascidos em Atenas.',
+  'Ficavam de fora: as mulheres, os metecos (estrangeiros que moravam lá) e os escravizados.',
+  'Mulheres ricas ficavam dentro de casa, no gineceu. As pobres trabalhavam nos mercados, como vendedoras ou lavadeiras.',
+  'Democracia direta: os cidadãos votavam tudo na Assembleia, umas 40 vezes por ano.',
+  'Paideia: jovens de 7 a 16 anos aprendiam ginástica (na palestra e no ginásio), música com a lira, leitura e escrita.'],
+ key:'O Brasil é uma democracia representativa: elegemos pessoas para decidir por nós.',
+ q:'Quem podia votar em Atenas?', opts:['Homens livres nascidos em Atenas','Todos os moradores da cidade','Homens e mulheres livres']},
+{id:'roma', c:'#C0392B', era:'Roma Antiga, a partir de 753 a.C.', title:'Roma: patrícios e plebeus', art:'roma',
+ facts:['Patrícios eram os nobres donos de terras. No começo, só eles eram cidadãos e ocupavam o Senado.',
+  'Plebeus eram camponeses, artesãos e comerciantes, chamados de populus, o povo.',
+  'Havia também os clientes, que serviam aos patrícios, e os escravizados.',
+  'Em 509 a.C., Roma virou uma república, palavra que quer dizer “coisa pública”.',
+  'Os plebeus viraram soldados da legião, os legionários. Em troca, exigiram direitos: votar nas assembleias e nos plebiscitos.',
+  'As eleições eram todo ano, no fórum.'],
+ q:'Como se chamavam os soldados romanos?', opts:['Legionários','Metecos','Patrícios']},
+{id:'escravidao', c:'#6E7894', era:'Antiguidade e hoje', title:'Escravidão: ontem e hoje', art:'escravidao',
+ facts:['Na Antiguidade, quem perdia uma guerra podia ser escravizado. Pessoas com dívidas também.',
+  'Em Roma, a maioria trabalhava na agricultura e na mineração. A libertação se chamava alforria.',
+  'Hoje a liberdade é um direito e o trabalho escravo é crime. No Brasil, é crime desde 2003.',
+  'Ainda existe trabalho análogo (parecido) à escravidão: pessoas pobres presas por dívidas e trabalho humilhante.',
+  'No gráfico do livro, 2008 teve mais resgates (1.456 pessoas) e 2016 teve menos (159).'],
+ q:'Hoje, no Brasil, manter alguém em trabalho escravo é…', opts:['crime','permitido no campo','permitido se a pessoa tiver dívida']},
+{id:'onu', c:'#4C9BE0', era:'1945 e 1948', title:'A ONU e os direitos humanos', art:'onu',
+ facts:['Direitos humanos valem para todas as pessoas do mundo, de qualquer origem, cor, idade ou religião.',
+  'A Segunda Guerra Mundial (1939 a 1945) deixou milhões de mortos, feridos e órfãos.',
+  'Em 1945, 50 países, incluindo o Brasil, criaram a ONU para trabalhar pela paz.',
+  'Em 10 de dezembro de 1948, a ONU fez a Declaração Universal dos Direitos Humanos, com 30 artigos.',
+  'Ela diz, por exemplo, que todos nascem livres e iguais e que ninguém pode ser escravizado.'],
+ q:'Por que a ONU foi criada?', opts:['Por causa da Segunda Guerra Mundial','Por causa da Revolução Francesa','Para acabar com a escravidão no Brasil']},
+{id:'franca', c:'#8E7CC3', era:'França, 1789', title:'Revolução Francesa', art:'franca',
+ facts:['1º estado: o clero (padres e bispos). Tinha muitos privilégios.',
+  '2º estado: a nobreza. O rei tinha poder absoluto e dizia ser o próprio Estado.',
+  '3º estado: a maioria do povo. Pagava impostos altos e não participava da política.',
+  'Uma crise econômica e uma seca, que trouxe falta de comida, fizeram o povo se revoltar.',
+  'O lema era liberdade, igualdade e fraternidade.',
+  'A Declaração dos Direitos do Homem e do Cidadão (17 artigos) disse que o Estado é o povo, a nação, e não o rei.'],
+ key:'Essas ideias inspiraram a Conjuração Mineira (1789) e a Conjuração Baiana (1798).',
+ q:'Quem fazia parte do 3º estado?', opts:['A maioria da população','O clero','A nobreza']},
+{id:'haiti', c:'#21A58C', era:'Haiti, de 1794 a 1804', title:'Haiti: a primeira abolição', art:'haiti',
+ facts:['Os europeus trouxeram africanos escravizados para a América: cerca de 12,5 milhões, sendo 4,5 milhões para o Brasil.',
+  'São Domingos, hoje Haiti, era uma colônia francesa rica em açúcar e café.',
+  'De 558 mil moradores, 500 mil eram escravizados.',
+  'Em 1794, a França declarou o fim da escravidão nas colônias.',
+  'Em 1804, liderados por Toussaint Louverture, filho de escravizados, declararam a independência.'],
+ key:'Primeiro país da América a abolir a escravidão: Haiti (1794). Último: Brasil (1888).',
+ q:'Qual foi o último país da América a abolir a escravidão?', opts:['Brasil','Haiti','Estados Unidos']},
+{id:'brasil', c:'#E9C46A', era:'Brasil, de 1850 a 1888', title:'A abolição no Brasil', art:'brasil',
+ facts:['1850, Lei Eusébio de Queirós: proibiu trazer africanos para o Brasil (o tráfico negreiro).',
+  '1871, Lei do Ventre Livre: filhos de escravizadas passaram a nascer livres.',
+  '1884: fim da escravidão no Ceará, no Amazonas e no Rio Grande do Sul.',
+  '1885, Lei dos Sexagenários: ficavam livres os maiores de 60 anos.',
+  '13 de maio de 1888, Lei Áurea: a princesa Isabel acabou com a escravidão no Brasil.',
+  'Pressões internas: os abolicionistas e a resistência dos escravizados. Pressão externa: a Inglaterra.'],
+ key:'Abolicionistas: Luiz Gama, Castro Alves, André Rebouças, Joaquim Nabuco, José do Patrocínio e Maria Firmina dos Reis.',
+ q:'Quem assinou a Lei Áurea?', opts:['A princesa Isabel','Dom Pedro II','Deodoro da Fonseca']},
+{id:'chibata', c:'#4A5266', era:'Rio de Janeiro, de 1889 a 1910', title:'República e Revolta da Chibata', art:'chibata',
+ facts:['Sem os escravizados, os fazendeiros deixaram de apoiar o imperador.',
+  'Em 15 de novembro de 1889, Deodoro da Fonseca proclamou a República e virou o primeiro presidente.',
+  'Os ex-escravizados ficaram sem moradia, escola, saúde e emprego. Muitos foram morar em cortiços.',
+  'Na Marinha, marinheiros negros ainda levavam chibatadas (chicotadas) como castigo.',
+  'Em 1910, João Cândido liderou 2.300 marinheiros: tomaram 5 navios e mandaram uma carta ao governo.',
+  'O governo aceitou, mas depois puniu os revoltosos. Mesmo assim, as chibatadas acabaram.'],
+ q:'Quem liderou a Revolta da Chibata?', opts:['João Cândido','Luiz Gama','Martin Luther King']},
+{id:'segregacao', c:'#F5B83D', era:'Estados Unidos e África do Sul', title:'Contra a segregação', art:'segregacao',
+ facts:['Segregar é separar. Leis separavam negros e brancos em escolas, praças, bebedouros e ônibus.',
+  'Em 1955, em Montgomery (EUA), Rosa Parks não cedeu seu lugar no ônibus a um passageiro branco e foi presa.',
+  'Martin Luther King organizou um boicote aos ônibus, sem violência. Ganhou o Nobel da Paz em 1964.',
+  'Na África do Sul, o apartheid (que quer dizer “separação”) começou em 1948.',
+  'Nelson Mandela ficou 27 anos preso (de 1962 a 1990), ganhou o Nobel em 1993 e virou presidente em 1994.'],
+ key:'Para Mandela, ninguém nasce odiando: o ódio se aprende, e o amor também.',
+ q:'O que foi o apartheid?', opts:['A separação entre negros e brancos na África do Sul','Um tratado de paz da ONU','Uma lei que acabou com a escravidão']}
+];
+
+const QUIZ = [
+{q:'Quais são os três tipos de direitos do cidadão?', o:['Civis, políticos e sociais','Gregos, romanos e franceses','Ricos, médios e pobres','Livres, escravos e estrangeiros'], w:'Civis (liberdade), políticos (voto) e sociais (cuidado do Estado).'},
+{q:'Votar é um direito…', o:['político','civil','social'], w:'Direitos políticos são os de participar: votar e ser votado.'},
+{q:'Ter saúde e alimentação é um direito…', o:['social','político','civil'], w:'Direitos sociais são o Estado cuidando das pessoas.'},
+{q:'Em Atenas, as mulheres ricas ficavam no…', o:['gineceu','fórum','Senado','ginásio'], w:'O gineceu era o espaço da casa onde elas organizavam a vida doméstica.'},
+{q:'Quem eram os metecos?', o:['Estrangeiros que viviam em Atenas','Soldados romanos','Nobres de Roma','Padres franceses'], w:'Trabalhavam no comércio e artesanato, pagavam impostos, mas não votavam.'},
+{q:'Como funcionava a democracia direta de Atenas?', o:['Os próprios cidadãos votavam as leis','O rei decidia tudo','Elegiam representantes','Todos os moradores votavam'], w:'Os cidadãos se reuniam na Assembleia para votar.'},
+{q:'O Brasil hoje é uma democracia…', o:['representativa','direta','absoluta'], w:'Elegemos representantes porque somos mais de 155 milhões de eleitores.'},
+{q:'O que os jovens aprendiam na Paideia?', o:['Ginástica, música, leitura e escrita','A lutar na legião','A navegar','Só matemática'], w:'Era a educação dos jovens atenienses de 7 a 16 anos.'},
+{q:'No começo de Roma, só eram cidadãos os…', o:['patrícios','plebeus','clientes','metecos'], w:'Os patrícios eram os nobres donos de terras.'},
+{q:'Como os plebeus conquistaram direitos em Roma?', o:['Viraram soldados nas guerras e exigiram participação','O rei deu de presente','Eram estrangeiros ricos','Fugiram para Atenas'], w:'Em troca de lutar na legião, exigiram participação política.'},
+{q:'O que quer dizer “república”?', o:['Coisa pública','Governo do rei','Povo de Roma','Lugar de votar'], w:'Para os romanos, era o governo com regras e união entre os cidadãos.'},
+{q:'Na Antiguidade, a maioria dos escravizados era…', o:['prisioneiros de guerra','nobres','soldados vencedores','cidadãos de Atenas'], w:'Quem perdia uma guerra podia ser escravizado. Endividados também.'},
+{q:'Desde quando o trabalho análogo à escravidão é crime no Brasil?', o:['2003','1888','1500','1948'], w:'A escravidão acabou em 1888, mas só virou crime em 2003.'},
+{q:'A ONU foi criada em 1945 por causa…', o:['da Segunda Guerra Mundial','da Revolução Francesa','da Lei Áurea','da Revolta da Chibata'], w:'Os países queriam evitar outra guerra daquele tamanho.'},
+{q:'Em que ano saiu a Declaração Universal dos Direitos Humanos?', o:['1948','1789','1888','1910'], w:'Foi em 10 de dezembro de 1948, e tem 30 artigos.'},
+{q:'Na França de 1789, a maioria da população era o…', o:['3º estado','1º estado','2º estado'], w:'O 3º estado pagava impostos e não participava da política.'},
+{q:'Qual era o lema da Revolução Francesa?', o:['Liberdade, igualdade e fraternidade','Ordem e progresso','Um por todos e todos por um','Paz e amor'], w:'Essas ideias chegaram até o Brasil e o Haiti.'},
+{q:'Quais acontecimentos levaram o povo francês à revolução?', o:['Uma crise econômica e uma seca','Um terremoto e uma enchente','A criação da ONU','O fim da escravidão'], w:'Tudo ficou caro e faltou comida.'},
+{q:'Qual foi o primeiro país da América a abolir a escravidão?', o:['Haiti','Brasil','Estados Unidos','Cuba'], w:'O Haiti, em 1794. O Brasil foi o último, em 1888.'},
+{q:'O que dizia a Lei do Ventre Livre (1871)?', o:['Filhos de escravizadas nasciam livres','Maiores de 60 anos eram livres','O tráfico estava proibido','Todos estavam livres'], w:'Mas as crianças ficavam com o senhor até os 8 anos.'},
+{q:'A Lei dos Sexagenários (1885) libertava…', o:['os maiores de 60 anos','as crianças','os marinheiros','os estrangeiros'], w:'Poucos chegavam a essa idade por causa dos maus-tratos.'},
+{q:'Por que a Inglaterra queria o fim da escravidão no Brasil?', o:['Para vender produtos a trabalhadores assalariados','Porque era amiga de Deodoro','Para levar escravizados para lá','Porque não gostava de café'], w:'Trabalhador com salário podia comprar os produtos ingleses.'},
+{q:'Onde e quando foi a Revolta da Chibata?', o:['Na Marinha, no Rio de Janeiro, em 1910','Em Atenas, há 2.500 anos','Na França, em 1789','Nos Estados Unidos, em 1955'], w:'Os marinheiros lutaram contra os castigos com chicote.'},
+{q:'Por que Rosa Parks ficou famosa?', o:['Não cedeu seu lugar no ônibus','Foi presidente dos EUA','Escreveu O navio negreiro','Liderou marinheiros'], w:'Foi em Montgomery, em 1955, e virou símbolo dos direitos civis.'},
+{q:'Como Martin Luther King lutava?', o:['Sem violência, com boicotes e desobediência civil','Com exércitos','Com navios de guerra','Escrevendo leis como rei'], w:'Ele ganhou o Nobel da Paz em 1964.'},
+{q:'Quantos anos Nelson Mandela ficou preso?', o:['27 anos','2 anos','60 anos','1 ano'], w:'De 1962 a 1990. Depois virou presidente da África do Sul.'}
+];
+
+const RIGHTS = [
+['Liberdade religiosa','civil'],['Liberdade de expressão','civil'],['Ir e vir','civil'],['Direito à justiça','civil'],['Liberdade de pensamento','civil'],
+['Votar','politico'],['Ser candidato','politico'],['Participar de partido político','politico'],['Propor leis','politico'],
+['Saúde','social'],['Educação','social'],['Alimentação','social'],['Moradia','social'],['Lazer','social']
+];
+const BUCKETS = {civil:'Civil', politico:'Político', social:'Social'};
+
+const EVENTS = [
+[-753,'753 a.C.','Fundação de Roma'],[-509,'509 a.C.','Roma vira república'],[1789,'1789','Revolução Francesa'],
+[1804,'1804','Independência do Haiti'],[1850,'1850','Lei Eusébio de Queirós'],[1871,'1871','Lei do Ventre Livre'],
+[1888,'1888','Lei Áurea'],[1889,'1889','Proclamação da República'],[1910,'1910','Revolta da Chibata'],
+[1945,'1945','Criação da ONU'],[1948,'1948','Declaração Universal dos Direitos Humanos'],[1955,'1955','Rosa Parks no ônibus'],
+[1994,'1994','Mandela vira presidente'],[2003,'2003','Trabalho escravo vira crime no Brasil']
+];
+
+const PEOPLE = [
+['Luiz Gama','Estudei sozinho, virei advogado sem diploma e libertei centenas de escravizados na Justiça.'],
+['Castro Alves','Fui poeta e escrevi O navio negreiro, sobre o sofrimento na travessia do oceano.'],
+['André Rebouças','Fui engenheiro, ajudei a fundar a Sociedade Brasileira contra a Escravidão e queria terras para os negros.'],
+['Joaquim Nabuco','Como deputado federal, ajudei a organizar a campanha pelo fim da escravidão.'],
+['José do Patrocínio','Estudei Farmácia, mas virei jornalista e fui um dos abolicionistas mais atuantes.'],
+['Maria Firmina dos Reis','Fui professora e escrevi Úrsula, o primeiro romance brasileiro com personagens negros.'],
+['Toussaint Louverture','Filho de escravizados, liderei a independência do Haiti em 1804.'],
+['João Cândido','Marinheiro, liderei a Revolta da Chibata em 1910.'],
+['Rosa Parks','Costureira, em 1955 não cedi meu lugar no ônibus em Montgomery.'],
+['Martin Luther King','Pastor, lutei sem violência e organizei o boicote aos ônibus. Ganhei o Nobel em 1964.'],
+['Nelson Mandela','Fiquei 27 anos preso por lutar contra o apartheid e depois virei presidente da África do Sul.'],
+['Princesa Isabel','Em 13 de maio de 1888, assinei a Lei Áurea.'],
+['Deodoro da Fonseca','Proclamei a República em 1889 e fui o primeiro presidente do Brasil.']
+];
+
+/* ---------- Estado ---------- */
+const $ = s => document.querySelector(s);
+const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+function load(){ try { const s = JSON.parse(localStorage.getItem('viagem-tempo')); if (s && s.stops && s.best) return s; } catch(e){} return {stops:{}, best:{}}; }
+const state = load();
+function save(){ try { localStorage.setItem('viagem-tempo', JSON.stringify(state)); } catch(e){} }
+function starsFor(pct){ return pct >= .9 ? 3 : pct >= .7 ? 2 : pct >= .5 ? 1 : 0; }
+function setBest(game, n){ if ((state.best[game] || 0) < n) { state.best[game] = n; save(); } updateTotal(); }
+function updateTotal(){
+  const stops = Object.keys(state.stops).length;
+  const games = ['quiz','separar','linha','quem'].reduce((s,g) => s + (state.best[g] || 0), 0);
+  $('#total').textContent = stops + games;
+}
+function starRow(n){ return [0,1,2].map(i => `<span class="${i < n ? '' : 'off'}">★</span>`).join(''); }
+function resultHTML(n, title, line, again){
+  const msg = ['Vale tentar de novo!','Bom começo!','Muito bem!','Mandou muito bem!'][n];
+  return `<div class="result"><div class="big-stars" aria-label="${n} de 3 estrelas">${starRow(n)}</div>
+    <h2>${msg}</h2><p>${line}</p>
+    <div class="row"><button class="btn" type="button" data-act="${again}">Jogar de novo</button>
+    <button class="btn ghost" type="button" data-go="inicio">Voltar ao início</button></div>${title || ''}</div>`;
+}
+
+/* ---------- Início ---------- */
+function renderHome(){
+  const done = Object.keys(state.stops).length;
+  const b = g => (state.best[g] || 0);
+  const st = n => n ? `${'★'.repeat(n)}${'☆'.repeat(3-n)}` : 'Ainda não jogado';
+  $('#v-inicio').innerHTML = `
+    <div class="hero">${ART.hero}</div>
+    <h1>Viagem no tempo da cidadania</h1>
+    <p class="lead">Revisão de História para a prova: de Atenas até Nelson Mandela. Visite as paradas e depois teste o que aprendeu nos jogos.</p>
+    <div class="doors">
+      <button class="door wide d1" type="button" data-go="paradas"><span class="ic">${ICON.paradas}</span><span><b>Visitar as 10 paradas</b><br><small>Cada parada tem um desenho, o resumo e uma pergunta rápida.</small><br><span class="st">${done} de 10 paradas concluídas</span></span></button>
+      <button class="door d2" type="button" data-go="quiz"><span class="ic">${ICON.quiz}</span><b>Quiz</b><small>10 perguntas sorteadas.</small><span class="st">${st(b('quiz'))}</span></button>
+      <button class="door d3" type="button" data-go="separar"><span class="ic">${ICON.separar}</span><b>Separe os direitos</b><small>Civil, político ou social?</small><span class="st">${st(b('separar'))}</span></button>
+      <button class="door d4" type="button" data-go="linha"><span class="ic">${ICON.linha}</span><b>Linha do tempo</b><small>Coloque os fatos em ordem.</small><span class="st">${st(b('linha'))}</span></button>
+      <button class="door d5" type="button" data-go="quem"><span class="ic">${ICON.quem}</span><b>Quem sou eu?</b><small>Adivinhe o personagem.</small><span class="st">${st(b('quem'))}</span></button>
+    </div>`;
+}
+
+/* ---------- Paradas ---------- */
+let stopIdx = 0;
+function renderStop(){
+  const s = STOPS[stopIdx];
+  const opts = shuffle(s.opts.map((t,i) => ({t, ok: i === 0})));
+  $('#v-paradas').innerHTML = `
+    <nav class="dots" aria-label="Paradas">${STOPS.map((x,i) => `<button type="button" class="dot ${state.stops[x.id] ? 'done' : ''} ${i === stopIdx ? 'cur' : ''}" data-stop="${i}" aria-label="Parada ${i+1}: ${x.title}" ${i === stopIdx ? 'aria-current="step"' : ''}>${i+1}</button>`).join('')}</nav>
+    <article class="stop" style="--c:${s.c}">
+      <div class="art">${ART[s.art]}</div>
+      <p class="era">${s.era}</p>
+      <h2>${s.title}</h2>
+      <ul class="facts">${s.facts.map(f => `<li>${f}</li>`).join('')}</ul>
+      ${s.key ? `<p class="key">${s.key}</p>` : ''}
+      <div class="check">
+        <h3>Pergunta rápida</h3>
+        <p class="q">${s.q}</p>
+        <div class="opts">${opts.map(o => `<button type="button" class="opt" data-ok="${o.ok}">${o.t}</button>`).join('')}</div>
+        <p class="fb" aria-live="polite"></p>
+      </div>
+      <div class="nav">
+        <button class="btn ghost" type="button" data-step="-1" ${stopIdx === 0 ? 'disabled' : ''}>Parada anterior</button>
+        <button class="btn" type="button" data-step="1">${stopIdx === STOPS.length - 1 ? 'Ir para os jogos' : 'Próxima parada'}</button>
+      </div>
+    </article>`;
+}
+$('#v-paradas').addEventListener('click', e => {
+  const t = e.target.closest('button'); if (!t) return;
+  if (t.dataset.stop) { stopIdx = +t.dataset.stop; renderStop(); scrollTo(0,0); return; }
+  if (t.dataset.step) {
+    const n = stopIdx + +t.dataset.step;
+    if (n >= STOPS.length) { location.hash = 'inicio'; return; }
+    stopIdx = Math.max(0, n); renderStop(); scrollTo(0,0); return;
+  }
+  if (t.classList.contains('opt') && !t.disabled) {
+    const fb = $('#v-paradas .fb');
+    if (t.dataset.ok === 'true') {
+      t.classList.add('ok');
+      document.querySelectorAll('#v-paradas .opt').forEach(b => b.disabled = true);
+      fb.className = 'fb good'; fb.textContent = 'Acertou! Parada concluída.';
+      state.stops[STOPS[stopIdx].id] = true; save(); updateTotal();
+      document.querySelector(`#v-paradas .dot[data-stop="${stopIdx}"]`).classList.add('done');
+    } else {
+      t.classList.add('no','shake'); t.disabled = true;
+      fb.className = 'fb bad'; fb.textContent = 'Quase! Releia os quadradinhos acima e tente outra.';
+    }
+  }
+});
+
+/* ---------- Quiz ---------- */
+let qz;
+function startQuiz(){ qz = {list: shuffle(QUIZ).slice(0,10), i:0, score:0, wrong:[]}; renderQ(); }
+function renderQ(){
+  const el = $('#v-quiz');
+  if (qz.i >= qz.list.length) {
+    const n = starsFor(qz.score / qz.list.length); setBest('quiz', n);
+    const rev = qz.wrong.length ? `<ul class="review">${qz.wrong.map(w => `<li><b>${w.q}</b><br>Resposta: ${w.o[0]}</li>`).join('')}</ul>` : '';
+    el.innerHTML = `<div class="gamehead"><h2>Quiz</h2></div><div style="height:14px"></div>` +
+      resultHTML(n, rev ? `<p style="margin-top:20px;font-weight:800">Para revisar:</p>${rev}` : '', `Você acertou ${qz.score} de ${qz.list.length}.`, 'quiz');
+    return;
+  }
+  const q = qz.list[qz.i];
+  const opts = shuffle(q.o.map((t,i) => ({t, ok: i === 0})));
+  el.innerHTML = `<div class="gamehead"><h2>Quiz</h2><p>Escolha a resposta certa.</p></div>
+    <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="10" aria-valuenow="${qz.i}"><i style="width:${qz.i*10}%"></i></div>
+    <div class="qcard"><p class="count">Pergunta ${qz.i+1} de ${qz.list.length}</p><h3>${q.q}</h3>
+    <div class="opts">${opts.map(o => `<button type="button" class="opt" data-ok="${o.ok}">${o.t}</button>`).join('')}</div>
+    <div class="explain-slot" aria-live="polite"></div></div>`;
+}
+$('#v-quiz').addEventListener('click', e => {
+  const t = e.target.closest('button'); if (!t) return;
+  if (t.dataset.act === 'quiz') { startQuiz(); return; }
+  if (t.dataset.next) { qz.i++; renderQ(); scrollTo(0,0); return; }
+  if (t.classList.contains('opt') && !t.disabled) {
+    const q = qz.list[qz.i], ok = t.dataset.ok === 'true';
+    document.querySelectorAll('#v-quiz .opt').forEach(b => { b.disabled = true; if (b.dataset.ok === 'true') b.classList.add('ok'); });
+    if (ok) qz.score++; else { t.classList.add('no','shake'); qz.wrong.push(q); }
+    $('#v-quiz .explain-slot').innerHTML = `<div class="explain"><b style="color:${ok ? 'var(--mint)' : 'var(--coral)'}">${ok ? 'Isso!' : 'Quase!'}</b>${q.w}</div>
+      <div class="nav"><button class="btn" type="button" data-next="1">${qz.i === qz.list.length - 1 ? 'Ver resultado' : 'Próxima pergunta'}</button></div>`;
+  }
+});
+
+/* ---------- Separe os direitos ---------- */
+let sp;
+function startSep(){ sp = {list: shuffle(RIGHTS), i:0, score:0, tried:false}; renderSep(); }
+function renderSep(){
+  const el = $('#v-separar');
+  if (sp.i >= sp.list.length) {
+    const n = starsFor(sp.score / sp.list.length); setBest('separar', n);
+    el.innerHTML = `<div class="gamehead"><h2>Separe os direitos</h2></div><div style="height:14px"></div>` +
+      resultHTML(n, '', `Você acertou ${sp.score} de ${sp.list.length} na primeira tentativa.`, 'separar');
+    return;
+  }
+  const [name] = sp.list[sp.i];
+  el.innerHTML = `<div class="gamehead"><h2>Separe os direitos</h2><p>Este direito é civil, político ou social?</p></div>
+    <div class="bar"><i style="width:${sp.i / sp.list.length * 100}%"></i></div>
+    <div class="item-card">${name}</div>
+    <div class="buckets">
+      <button type="button" class="bucket b-civil" data-b="civil">${ICON.civil}<span><b>Civil</b><small>Liberdade</small></span></button>
+      <button type="button" class="bucket b-politico" data-b="politico">${ICON.politico}<span><b>Político</b><small>Participar e votar</small></span></button>
+      <button type="button" class="bucket b-social" data-b="social">${ICON.social}<span><b>Social</b><small>O Estado cuidando de todos</small></span></button>
+    </div>
+    <p class="fb" aria-live="polite"></p>`;
+  sp.tried = false;
+}
+$('#v-separar').addEventListener('click', e => {
+  const t = e.target.closest('button'); if (!t) return;
+  if (t.dataset.act === 'separar') { startSep(); return; }
+  if (t.dataset.b) {
+    const right = sp.list[sp.i][1], fb = $('#v-separar .fb'), card = $('#v-separar .item-card');
+    if (t.dataset.b === right) {
+      if (!sp.tried) sp.score++;
+      fb.className = 'fb good'; fb.textContent = `Isso! É um direito ${BUCKETS[right].toLowerCase()}.`;
+      document.querySelectorAll('#v-separar .bucket').forEach(b => b.style.pointerEvents = 'none');
+      setTimeout(() => { sp.i++; renderSep(); }, 900);
+    } else {
+      sp.tried = true; card.classList.remove('shake'); void card.offsetWidth; card.classList.add('shake');
+      fb.className = 'fb bad'; fb.textContent = 'Não é esse. Lembre: civil é liberdade, político é voto, social é cuidado.';
+    }
+  }
+});
+
+/* ---------- Linha do tempo ---------- */
+let ln;
+function startLinha(){ const pick = shuffle(EVENTS).slice(0,7); ln = {pool: shuffle(pick), placed: [], miss:0}; renderLinha(); }
+function renderLinha(){
+  const el = $('#v-linha');
+  if (!ln.pool.length) {
+    const n = ln.miss === 0 ? 3 : ln.miss <= 2 ? 2 : ln.miss <= 4 ? 1 : 0; setBest('linha', n);
+    el.innerHTML = `<div class="gamehead"><h2>Linha do tempo</h2></div><div style="height:14px"></div>
+      <ol class="tl">${ln.placed.map(ev => `<li><b>${ev[1]}</b>${ev[2]}</li>`).join('')}</ol>` +
+      resultHTML(n, '', ln.miss ? `Você errou ${ln.miss} ${ln.miss === 1 ? 'vez' : 'vezes'}.` : 'Sem nenhum erro!', 'linha');
+    return;
+  }
+  el.innerHTML = `<div class="gamehead"><h2>Linha do tempo</h2><p>Toque nos fatos do mais antigo para o mais recente.</p></div>
+    <div style="height:14px"></div>
+    ${ln.placed.length ? `<ol class="tl">${ln.placed.map(ev => `<li><b>${ev[1]}</b>${ev[2]}</li>`).join('')}</ol>` : ''}
+    <p class="hint">${ln.placed.length ? 'Qual veio depois?' : 'Qual aconteceu primeiro?'}</p>
+    <div class="pool">${ln.pool.map((ev,i) => `<button type="button" class="opt" data-ev="${i}">${ev[2]}</button>`).join('')}</div>
+    <p class="fb" aria-live="polite"></p>`;
+}
+$('#v-linha').addEventListener('click', e => {
+  const t = e.target.closest('button'); if (!t) return;
+  if (t.dataset.act === 'linha') { startLinha(); return; }
+  if (t.dataset.ev !== undefined) {
+    const ev = ln.pool[+t.dataset.ev];
+    const min = Math.min(...ln.pool.map(x => x[0]));
+    if (ev[0] === min) { ln.placed.push(ev); ln.pool.splice(+t.dataset.ev, 1); renderLinha(); }
+    else {
+      ln.miss++; t.classList.remove('shake'); void t.offsetWidth; t.classList.add('shake');
+      const fb = $('#v-linha .fb'); fb.className = 'fb bad'; fb.textContent = `“${ev[2]}” aconteceu em ${ev[1]}, mas tem outro fato mais antigo.`;
+    }
+  }
+});
+
+/* ---------- Quem sou eu ---------- */
+let qm;
+function startQuem(){ qm = {list: shuffle(PEOPLE).slice(0,8), i:0, score:0}; renderQuem(); }
+function renderQuem(){
+  const el = $('#v-quem');
+  if (qm.i >= qm.list.length) {
+    const n = starsFor(qm.score / qm.list.length); setBest('quem', n);
+    el.innerHTML = `<div class="gamehead"><h2>Quem sou eu?</h2></div><div style="height:14px"></div>` +
+      resultHTML(n, '', `Você acertou ${qm.score} de ${qm.list.length}.`, 'quem');
+    return;
+  }
+  const [name, clue] = qm.list[qm.i];
+  const others = shuffle(PEOPLE.filter(p => p[0] !== name)).slice(0,3).map(p => p[0]);
+  const opts = shuffle([name, ...others]);
+  el.innerHTML = `<div class="gamehead"><h2>Quem sou eu?</h2><p>Leia a pista e descubra o personagem.</p></div>
+    <div class="bar"><i style="width:${qm.i / qm.list.length * 100}%"></i></div>
+    <div class="qcard"><p class="count">Personagem ${qm.i+1} de ${qm.list.length}</p>
+    <div class="who">${ICON.mystery}<p>“${clue}”</p></div>
+    <div class="opts">${opts.map(o => `<button type="button" class="opt" data-ok="${o === name}">${o}</button>`).join('')}</div>
+    <div class="explain-slot" aria-live="polite"></div></div>`;
+}
+$('#v-quem').addEventListener('click', e => {
+  const t = e.target.closest('button'); if (!t) return;
+  if (t.dataset.act === 'quem') { startQuem(); return; }
+  if (t.dataset.next) { qm.i++; renderQuem(); scrollTo(0,0); return; }
+  if (t.classList.contains('opt') && !t.disabled) {
+    const ok = t.dataset.ok === 'true', name = qm.list[qm.i][0];
+    document.querySelectorAll('#v-quem .opt').forEach(b => { b.disabled = true; if (b.dataset.ok === 'true') b.classList.add('ok'); });
+    if (ok) qm.score++; else t.classList.add('no','shake');
+    $('#v-quem .explain-slot').innerHTML = `<div class="explain"><b style="color:${ok ? 'var(--mint)' : 'var(--coral)'}">${ok ? 'Acertou!' : 'Era ' + name + '.'}</b></div>
+      <div class="nav"><button class="btn" type="button" data-next="1">${qm.i === qm.list.length - 1 ? 'Ver resultado' : 'Próximo personagem'}</button></div>`;
+  }
+});
+
+/* ---------- Navegação ---------- */
+const INIT = {inicio: renderHome, paradas: renderStop, quiz: startQuiz, separar: startSep, linha: startLinha, quem: startQuem};
+const TITLES = {inicio:'Viagem no tempo', paradas:'As 10 paradas', quiz:'Quiz', separar:'Separe os direitos', linha:'Linha do tempo', quem:'Quem sou eu?'};
+function route(){
+  let v = location.hash.slice(1);
+  if (!INIT[v]) v = 'inicio';
+  document.querySelectorAll('[data-view]').forEach(s => s.hidden = s.dataset.view !== v);
+  $('#home-btn').hidden = v === 'inicio';
+  $('#brand').textContent = TITLES[v];
+  INIT[v](); updateTotal(); window.scrollTo(0,0);
+}
+document.addEventListener('click', e => {
+  const g = e.target.closest('[data-go]');
+  if (g) { const v = g.dataset.go; if (location.hash.slice(1) === v) route(); else location.hash = v; }
+});
+$('#home-btn').addEventListener('click', () => { location.hash = 'inicio'; });
+window.addEventListener('hashchange', route);
+route();
+</script>
+<script src="../../assets/voltar.js" defer></script>
+</body>
+</html>

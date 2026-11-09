@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Applets de estudo</title>
+<meta name="description" content="Simulações, exploradores e treinos interativos para estudar matemática, ciências e humanas.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📚</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F6F7FB; --card:#FFFFFF; --ink:#17213A; --muted:#5A6580; --line:#DDE2EE; --soft:#EEF1F8;
+  --blue:#2358C6;   --blue-bg:#E7EEFC;
+  --green:#1E8653;  --green-bg:#E3F4EA;
+  --orange:#C25E0C; --orange-bg:#FCEEDF;
+  --teal:#0F7C86;   --teal-bg:#DFF3F4;
+  --violet:#7440AA; --violet-bg:#F0E8F8;
+  --focus:#2358C6; --shadow:0 1px 2px rgba(20,30,60,.06),0 4px 14px rgba(20,30,60,.06);
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#121722; --card:#1A2130; --ink:#E9EDF5; --muted:#A3ADC2; --line:#2C3547; --soft:#222A3B;
+    --blue:#93B8FF; --blue-bg:#1F2C4A; --green:#7FD7A2; --green-bg:#18332A;
+    --orange:#FFB572; --orange-bg:#3A2A1A; --teal:#7CD6DE; --teal-bg:#173539;
+    --violet:#CDA8FF; --violet-bg:#2D2440; --focus:#93B8FF; --shadow:none; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#121722; --card:#1A2130; --ink:#E9EDF5; --muted:#A3ADC2; --line:#2C3547; --soft:#222A3B;
+  --blue:#93B8FF; --blue-bg:#1F2C4A; --green:#7FD7A2; --green-bg:#18332A;
+  --orange:#FFB572; --orange-bg:#3A2A1A; --teal:#7CD6DE; --teal-bg:#173539;
+  --violet:#CDA8FF; --violet-bg:#2D2440; --focus:#93B8FF; --shadow:none; color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 "Lexend",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.wrap{max-width:1120px;margin:0 auto;padding:28px 16px 64px}
+header{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:22px}
+h1{font-size:clamp(1.6rem,4vw,2.2rem);margin:0 0 4px;letter-spacing:-.02em}
+.sub{margin:0;color:var(--muted);max-width:60ch}
+.theme{font:inherit;font-size:.85rem;cursor:pointer;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:999px;padding:6px 12px;white-space:nowrap}
+
+.controls{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;box-shadow:var(--shadow);display:grid;gap:12px;margin-bottom:26px}
+.search{position:relative}
+.search input{width:100%;font:inherit;padding:10px 12px 10px 38px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink)}
+.search svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted)}
+.row{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+.row .lbl{font-size:.8rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;min-width:96px}
+.chip{font:inherit;font-size:.88rem;cursor:pointer;border:1px solid var(--line);background:transparent;color:var(--ink);border-radius:999px;padding:5px 12px;display:inline-flex;align-items:center;gap:6px}
+.chip .n{font-size:.75rem;color:var(--muted)}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--card);border-color:var(--ink)}
+.chip[aria-pressed="true"] .n{color:inherit;opacity:.75}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.seg button{font:inherit;font-size:.86rem;cursor:pointer;border:0;background:transparent;color:var(--ink);padding:6px 12px}
+.seg button+button{border-left:1px solid var(--line)}
+.seg button[aria-pressed="true"]{background:var(--soft);font-weight:600}
+button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+
+.group{margin:0 0 30px}
+.group h2{font-size:1.25rem;margin:0 0 2px;display:flex;align-items:center;gap:10px}
+.group h2 .dot{width:12px;height:12px;border-radius:50%;background:var(--c)}
+.group h2 .count{font-size:.85rem;font-weight:400;color:var(--muted)}
+.topic{margin:14px 0 0}
+.topic h3{font-size:.95rem;font-weight:600;color:var(--muted);margin:0 0 10px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
+
+.card{display:flex;flex-direction:column;gap:10px;text-decoration:none;color:inherit;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;box-shadow:var(--shadow);border-top:4px solid var(--c);transition:transform .12s ease,border-color .12s ease}
+.card:hover{transform:translateY(-2px);border-color:var(--c)}
+.card .top{display:flex;gap:12px;align-items:flex-start}
+.card .ico{font-size:1.7rem;line-height:1;width:44px;height:44px;display:grid;place-items:center;border-radius:12px;background:var(--cbg);flex:none}
+.card h4{margin:0;font-size:1.05rem;line-height:1.3}
+.card .meta{font-size:.8rem;color:var(--muted);margin-top:2px}
+.card p{margin:0;font-size:.92rem;color:var(--muted)}
+.card .foot{margin-top:auto;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.tag{font-size:.75rem;padding:2px 8px;border-radius:999px;background:var(--cbg);color:var(--c);font-weight:500}
+.lvl{display:inline-flex;align-items:center;gap:6px;font-size:.8rem;color:var(--muted)}
+.bars{display:inline-flex;gap:2px;align-items:flex-end}
+.bars i{display:block;width:5px;border-radius:2px;background:var(--line)}
+.bars i:nth-child(1){height:7px}.bars i:nth-child(2){height:11px}.bars i:nth-child(3){height:15px}
+.bars i.on{background:var(--c)}
+
+.empty{text-align:center;color:var(--muted);padding:40px 16px;border:1px dashed var(--line);border-radius:14px}
+footer{margin-top:40px;font-size:.85rem;color:var(--muted);border-top:1px solid var(--line);padding-top:16px}
+footer code{background:var(--soft);padding:1px 5px;border-radius:4px}
+@media (max-width:560px){.row .lbl{min-width:100%}header{flex-direction:column}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>📚 Applets de estudo</h1>
+      <p class="sub">Simulações, exploradores e treinos interativos para estudar junto com os guias. Filtre por disciplina e nível, ou procure um assunto.</p>
+    </div>
+    <button class="theme" id="theme" type="button">Tema</button>
+  </header>
+
+  <section class="controls" aria-label="Filtros">
+    <label class="search">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input id="q" type="search" placeholder="Procurar: parábola, juros, balanceamento…" aria-label="Procurar applets">
+    </label>
+    <div class="row" id="fDisc"><span class="lbl">Disciplina</span></div>
+    <div class="row" id="fNivel"><span class="lbl">Nível</span></div>
+    <div class="row"><span class="lbl">Organizar</span>
+      <div class="seg" id="fGroup" role="group" aria-label="Organizar por">
+        <button type="button" data-v="topico">Por tópico</button>
+        <button type="button" data-v="nivel">Por nível</button>
+        <button type="button" data-v="recentes">Mais recentes</button>
+      </div>
+    </div>
+  </section>
+
+  <main id="out" aria-live="polite"></main>
+
+  <footer>
+    Para adicionar um applet: crie a pasta <code>applets/nome-do-applet/</code> com um <code>index.html</code> e registre-o em <code>applets.js</code>. Veja o README.
+  </footer>
+</div>
+
+<script src="applets.js"></script>
+<script>
+(function(){
+  var D = window.DISCIPLINAS || {}, A = window.APPLETS || [];
+  var NIVEIS = {1:'Básico', 2:'Intermediário', 3:'Avançado'};
+  var S = {q:'', d:'', n:0, g:'topico'};
+  var $ = function(s){return document.querySelector(s);};
+  var esc = function(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});};
+  var norm = function(s){return String(s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');};
+  var cor = function(k){var c=(D[k]&&D[k].cor)||'blue'; return 'style="--c:var(--'+c+');--cbg:var(--'+c+'-bg)"';};
+
+  /* estado na URL (#d=quimica&n=2&g=nivel&q=...) para poder compartilhar o filtro */
+  function readHash(){
+    var p = new URLSearchParams(location.hash.slice(1));
+    S.q = p.get('q')||''; S.d = D[p.get('d')] ? p.get('d') : '';
+    S.n = +p.get('n')||0; if(!NIVEIS[S.n]) S.n=0;
+    S.g = ['topico','nivel','recentes'].indexOf(p.get('g'))>=0 ? p.get('g') : 'topico';
+  }
+  function writeHash(){
+    var p = new URLSearchParams();
+    if(S.q) p.set('q',S.q); if(S.d) p.set('d',S.d); if(S.n) p.set('n',S.n); if(S.g!=='topico') p.set('g',S.g);
+    var h = p.toString(); history.replaceState(null,'',h?'#'+h:location.pathname+location.search);
+  }
+
+  function match(a, ignore){
+    if(ignore!=='d' && S.d && a.disciplina!==S.d) return false;
+    if(ignore!=='n' && S.n && a.nivel!==S.n) return false;
+    if(S.q){
+      var hay = norm([a.titulo,a.descricao,a.topico,a.tipo,a.serie,(D[a.disciplina]||{}).nome].concat(a.tags||[]).join(' '));
+      var ok = norm(S.q).split(/\s+/).filter(Boolean).every(function(w){return hay.indexOf(w)>=0;});
+      if(!ok) return false;
+    }
+    return true;
+  }
+
+  function chips(){
+    var fd = $('#fDisc'), fn = $('#fNivel');
+    fd.querySelectorAll('.chip').forEach(function(e){e.remove();});
+    fn.querySelectorAll('.chip').forEach(function(e){e.remove();});
+    var cnt = function(key,val){return A.filter(function(a){return match(a,key) && (val===''||val===0||a[key==='d'?'disciplina':'nivel']===val);}).length;};
+    var mk = function(par,label,n,pressed,on){
+      var b=document.createElement('button'); b.type='button'; b.className='chip';
+      b.setAttribute('aria-pressed',String(pressed)); b.innerHTML=esc(label)+' <span class="n">'+n+'</span>';
+      b.onclick=on; par.appendChild(b);
+    };
+    mk(fd,'Todas',cnt('d',''),!S.d,function(){S.d='';update();});
+    Object.keys(D).forEach(function(k){
+      if(!A.some(function(a){return a.disciplina===k;})) return;
+      mk(fd,D[k].nome,cnt('d',k),S.d===k,function(){S.d=S.d===k?'':k;update();});
+    });
+    mk(fn,'Todos',cnt('n',0),!S.n,function(){S.n=0;update();});
+    [1,2,3].forEach(function(n){ mk(fn,NIVEIS[n],cnt('n',n),S.n===n,function(){S.n=S.n===n?0:n;update();}); });
+    document.querySelectorAll('#fGroup button').forEach(function(b){b.setAttribute('aria-pressed',String(b.dataset.v===S.g));});
+  }
+
+  function card(a){
+    var d = D[a.disciplina]||{nome:a.disciplina};
+    var bars = [1,2,3].map(function(i){return '<i class="'+(i<=a.nivel?'on':'')+'"></i>';}).join('');
+    var meta = [d.nome, a.serie].filter(Boolean).join(' · ');
+    return '<a class="card" href="applets/'+encodeURIComponent(a.pasta)+'/index.html" '+cor(a.disciplina)+'>'+
+      '<div class="top"><div class="ico" aria-hidden="true">'+esc(a.icone||'🧩')+'</div>'+
+      '<div><h4>'+esc(a.titulo)+'</h4><div class="meta">'+esc(meta)+'</div></div></div>'+
+      '<p>'+esc(a.descricao)+'</p>'+
+      '<div class="foot"><span class="tag">'+esc(a.tipo||'Applet')+'</span>'+
+      '<span class="lvl" title="Nível '+a.nivel+' de 3"><span class="bars" aria-hidden="true">'+bars+'</span>'+esc(NIVEIS[a.nivel]||'')+'</span></div></a>';
+  }
+  var grid = function(list){return '<div class="grid">'+list.map(card).join('')+'</div>';};
+  var byLvlTitle = function(x,y){return (x.nivel-y.nivel)||x.titulo.localeCompare(y.titulo,'pt');};
+
+  function render(){
+    var L = A.filter(function(a){return match(a);}), h='';
+    if(!L.length){ $('#out').innerHTML='<div class="empty">Nenhum applet encontrado com esses filtros.</div>'; return; }
+    if(S.g==='topico'){
+      Object.keys(D).forEach(function(k){
+        var g = L.filter(function(a){return a.disciplina===k;}); if(!g.length) return;
+        var topics = []; g.forEach(function(a){ if(topics.indexOf(a.topico)<0) topics.push(a.topico); });
+        topics.sort(function(x,y){return x.localeCompare(y,'pt');});
+        h += '<section class="group" '+cor(k)+'><h2><span class="dot"></span>'+esc(D[k].nome)+' <span class="count">'+g.length+'</span></h2>';
+        topics.forEach(function(t){
+          h += '<div class="topic"><h3>'+esc(t)+'</h3>'+grid(g.filter(function(a){return a.topico===t;}).sort(byLvlTitle))+'</div>';
+        });
+        h += '</section>';
+      });
+    } else if(S.g==='nivel'){
+      [1,2,3].forEach(function(n){
+        var g = L.filter(function(a){return a.nivel===n;}); if(!g.length) return;
+        g.sort(function(x,y){return x.disciplina.localeCompare(y.disciplina)||x.topico.localeCompare(y.topico,'pt');});
+        h += '<section class="group" style="--c:var(--ink)"><h2>'+'●'.repeat(n)+' '+NIVEIS[n]+' <span class="count">'+g.length+'</span></h2>'+grid(g)+'</section>';
+      });
+    } else {
+      var g = L.slice().sort(function(x,y){return String(y.data||'').localeCompare(String(x.data||''))||x.titulo.localeCompare(y.titulo,'pt');});
+      h = '<section class="group">'+grid(g)+'</section>';
+    }
+    $('#out').innerHTML = h;
+  }
+
+  function update(){ chips(); render(); writeHash(); }
+
+  $('#q').addEventListener('input',function(e){ S.q=e.target.value.trim(); update(); });
+  document.querySelectorAll('#fGroup button').forEach(function(b){ b.onclick=function(){S.g=b.dataset.v;update();}; });
+  window.addEventListener('hashchange',function(){ readHash(); $('#q').value=S.q; chips(); render(); });
+
+  /* tema claro/escuro manual (lembrado só neste navegador) */
+  var root=document.documentElement, tb=$('#theme');
+  function setTheme(t){ if(t) root.setAttribute('data-theme',t); else root.removeAttribute('data-theme');
+    var dark = t ? t==='dark' : matchMedia('(prefers-color-scheme: dark)').matches; tb.textContent = dark ? '☀️ Claro' : '🌙 Escuro'; }
+  try{ setTheme(localStorage.getItem('applets-tema')); }catch(e){ setTheme(null); }
+  tb.onclick=function(){ var dark = root.getAttribute('data-theme') ? root.getAttribute('data-theme')==='dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+    var t = dark?'light':'dark'; setTheme(t); try{localStorage.setItem('applets-tema',t);}catch(e){} };
+
+  readHash(); $('#q').value=S.q; update();
+})();
+</script>
+</body>
+</html>

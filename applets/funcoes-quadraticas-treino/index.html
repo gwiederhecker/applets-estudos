@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Treino de funções quadráticas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Lexend:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F5F8FC; --grid:#DCE6F2; --grid-strong:#B7CBE2; --ink:#1B2A47; --muted:#56667F;
+  --card:#FFFFFF; --line:#C8D6E7; --red:#C8243A; --green:#1E8653; --blue:#2358C6;
+  --orange:#C9640F; --violet:#7440AA; --marker:#FFE45C; --focus:#2358C6;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#1B2722; --grid:#26342E; --grid-strong:#354840; --ink:#EDF0E7; --muted:#A6B2AA;
+    --card:#21302A; --line:#394A42; --red:#FF8787; --green:#80DBA0; --blue:#93C2FF;
+    --orange:#FFB872; --violet:#CDA8FF; --marker:#5E5420; --focus:#93C2FF; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#1B2722; --grid:#26342E; --grid-strong:#354840; --ink:#EDF0E7; --muted:#A6B2AA;
+  --card:#21302A; --line:#394A42; --red:#FF8787; --green:#80DBA0; --blue:#93C2FF;
+  --orange:#FFB872; --violet:#CDA8FF; --marker:#5E5420; --focus:#93C2FF; color-scheme: dark;
+}
+:root{ box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px); }
+html{ scroll-padding-top:env(safe-area-inset-top,0px); }
+*,*::before,*::after{ box-sizing:inherit; }
+body{
+  margin:0; color:var(--ink); background-color:var(--paper);
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size:26px 26px;
+  font-family:"Lexend", "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
+  font-size:16px; line-height:1.55;
+}
+.wrap{ max-width:1120px; margin:0 auto; padding:20px 16px 56px; }
+.top{ padding:10px 0 18px; }
+.brand{
+  font-family:"Caveat", "Comic Sans MS", cursive; font-weight:700; font-size:2.6rem; line-height:1;
+  margin:0 0 6px; color:var(--red); display:inline-block;
+  background:linear-gradient(transparent 62%, var(--marker) 62%, var(--marker) 92%, transparent 92%);
+  padding:0 6px;
+}
+h1{ font-size:clamp(1.35rem, 3.4vw, 1.9rem); margin:4px 0 6px; font-weight:700; letter-spacing:-0.01em; }
+.lede{ margin:0; color:var(--muted); max-width:62ch; }
+.tabs{ display:flex; gap:4px; overflow-x:auto; border-bottom:2px solid var(--ink); margin:18px 0 0; scrollbar-width:thin; }
+.tabs button{
+  font:inherit; font-size:0.95rem; white-space:nowrap; cursor:pointer; color:var(--ink);
+  background:var(--paper); border:1.5px solid var(--line); border-bottom:none; border-radius:10px 10px 0 0;
+  padding:9px 14px 7px; margin-top:6px;
+}
+.tabs button[aria-selected="true"]{ background:var(--card); border-color:var(--ink); border-width:2px; margin-top:0; padding-top:12px; font-weight:600; position:relative; top:2px; }
+.panel{ background:var(--card); border:2px solid var(--ink); border-top:none; border-radius:0 0 12px 12px; padding:20px; }
+.panel[hidden]{ display:none; }
+.grid2{ display:grid; grid-template-columns:minmax(0,1.12fr) minmax(0,1fr); gap:22px; align-items:start; }
+@media (max-width:860px){ .grid2{ grid-template-columns:minmax(0,1fr); } .panel{ padding:14px; } }
+canvas.plot{ width:100%; aspect-ratio:1/1; display:block; border:1.5px solid var(--line); border-radius:8px; background:var(--card); }
+canvas.plot.drag{ touch-action:none; }
+canvas.strip{ width:100%; height:70px; display:block; margin-top:8px; }
+h2{ font-family:"Caveat", "Comic Sans MS", cursive; font-weight:700; font-size:2rem; line-height:1.1; margin:0 0 6px; }
+h3{ font-size:1rem; margin:16px 0 6px; }
+p{ margin:0 0 10px; }
+.muted{ color:var(--muted); }
+.small{ font-size:0.88rem; }
+.formula{ font-size:1.25rem; font-weight:600; margin:6px 0 12px; font-variant-numeric:tabular-nums; }
+.ctrl{ margin:10px 0; }
+.ctrl label{ display:flex; justify-content:space-between; font-size:0.95rem; margin-bottom:2px; }
+.ctrl output{ font-weight:600; font-variant-numeric:tabular-nums; }
+input[type=range]{ width:100%; accent-color:var(--blue); height:28px; }
+.row{ display:flex; flex-wrap:wrap; gap:8px; margin:10px 0; }
+.btn{
+  font:inherit; font-size:0.95rem; cursor:pointer; border-radius:8px; padding:8px 14px;
+  border:1.5px solid var(--ink); background:var(--ink); color:var(--card); font-weight:500;
+}
+.btn.ghost{ background:transparent; color:var(--ink); }
+.btn.chip{ background:transparent; color:var(--ink); border-color:var(--line); font-size:0.88rem; padding:5px 10px; }
+.btn.chip[aria-pressed="true"]{ border-color:var(--ink); background:var(--marker); }
+.btn:disabled{ opacity:0.4; cursor:not-allowed; }
+button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-visible{ outline:3px solid var(--focus); outline-offset:2px; }
+select{ font:inherit; padding:7px 10px; border-radius:8px; border:1.5px solid var(--line); background:var(--card); color:var(--ink); width:100%; }
+.steps{ list-style:none; padding:0; margin:12px 0; counter-reset:s; }
+.steps li{ border-left:3px solid var(--line); padding:6px 0 8px 14px; margin:0 0 6px; position:relative; }
+.steps li .t{ font-weight:600; }
+.steps li.on{ border-left-color:var(--blue); }
+.steps li.off .body{ display:none; }
+.steps li.off .t{ color:var(--muted); }
+.fr{ display:inline-flex; flex-direction:column; vertical-align:middle; text-align:center; font-size:0.9em; line-height:1.2; margin:0 2px; }
+.fr > span:first-child{ border-bottom:1.2px solid currentColor; padding:0 3px; }
+.fr > span:last-child{ padding:0 3px; }
+.note{ border:1.5px dashed var(--line); border-radius:8px; padding:10px 12px; margin:12px 0; font-size:0.93rem; }
+.warn{ border:2px solid var(--red); border-radius:8px; padding:10px 12px; margin:12px 0; font-size:0.93rem; }
+.warn b{ color:var(--red); }
+.pos{ color:var(--green); font-weight:600; }
+.neg{ color:var(--red); font-weight:600; }
+.zero{ color:var(--blue); font-weight:600; }
+.sent{ margin:4px 0; font-variant-numeric:tabular-nums; }
+.m{ white-space:nowrap; font-weight:600; }
+footer{ color:var(--muted); font-size:0.85rem; margin-top:22px; }
+
+.score{ display:flex; flex-wrap:wrap; gap:6px 18px; align-items:baseline; font-size:0.92rem; color:var(--muted); margin:0 0 12px; }
+.score b{ color:var(--ink); font-size:1.05rem; }
+.q{ font-size:1.05rem; margin:0 0 12px; }
+.fields{ display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:10px 14px; margin:8px 0 12px; }
+.fld{ display:flex; flex-direction:column; gap:3px; position:relative; }
+.fld .lbl{ font-size:0.88rem; color:var(--muted); }
+.fld .inrow{ display:flex; align-items:center; gap:6px; }
+.fld input{ font:inherit; font-size:1.05rem; width:100%; min-width:0; padding:7px 10px; border-radius:8px; border:1.5px solid var(--line); background:var(--card); color:var(--ink); font-variant-numeric:tabular-nums; }
+.fld .unit{ font-size:0.9rem; color:var(--muted); }
+.fld .mk{ width:1.2em; font-weight:700; }
+.fld.ok input{ border-color:var(--green); } .fld.ok .mk::after{ content:"✓"; color:var(--green); }
+.fld.bad input{ border-color:var(--red); } .fld.bad .mk::after{ content:"✗"; color:var(--red); }
+.check{ display:flex; align-items:center; gap:8px; font-size:0.95rem; margin:4px 0 10px; }
+.check input{ width:20px; height:20px; accent-color:var(--blue); }
+.seg{ display:inline-flex; gap:6px; flex-wrap:wrap; }
+.seg button{ font:inherit; cursor:pointer; padding:7px 14px; border-radius:8px; border:1.5px solid var(--line); background:var(--card); color:var(--ink); }
+.seg button[aria-pressed="true"]{ border-color:var(--ink); background:var(--marker); font-weight:600; }
+.seg.ok button[aria-pressed="true"]{ border-color:var(--green); } .seg.bad button[aria-pressed="true"]{ border-color:var(--red); }
+.stage{ border-top:1.5px dashed var(--line); padding-top:12px; margin-top:12px; }
+.stage.locked{ display:none; }
+.nline{ display:flex; align-items:stretch; margin:10px 0 6px; }
+.nline .reg{ flex:1; font:inherit; font-size:1.3rem; font-weight:700; cursor:pointer; min-height:52px; border:1.5px solid var(--line); background:var(--card); color:var(--muted); border-radius:8px; }
+.nline .reg[data-s="+"]{ color:var(--green); border-color:var(--green); }
+.nline .reg[data-s="−"]{ color:var(--red); border-color:var(--red); }
+.nline .rt{ display:flex; align-items:center; padding:0 8px; font-weight:600; font-size:0.95rem; }
+.nline.bad .reg{ box-shadow:0 0 0 2px var(--red) inset; } .nline.ok .reg{ box-shadow:0 0 0 2px var(--green) inset; }
+.opts{ display:flex; flex-direction:column; gap:8px; margin:8px 0; }
+.opts label{ display:flex; gap:10px; align-items:center; border:1.5px solid var(--line); border-radius:8px; padding:9px 12px; cursor:pointer; font-variant-numeric:tabular-nums; }
+.opts label:has(input:checked){ border-color:var(--ink); background:color-mix(in srgb, var(--marker) 45%, transparent); }
+.opts.ok label:has(input:checked){ border-color:var(--green); } .opts.bad label:has(input:checked){ border-color:var(--red); }
+.opts input{ width:18px; height:18px; accent-color:var(--blue); }
+.feedback{ margin:12px 0 0; padding:10px 12px; border-radius:8px; display:none; }
+.feedback.ok{ display:block; border:2px solid var(--green); }
+.feedback.bad{ display:block; border:2px solid var(--red); }
+.feedback ul{ margin:6px 0 0; padding-left:20px; }
+.sol{ margin-top:14px; }
+.sol .steps li{ border-left-color:var(--blue); }
+.qgrid{ display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:20px; align-items:start; }
+@media (max-width:860px){ .qgrid{ grid-template-columns:minmax(0,1fr); } }
+details{ margin:6px 0 10px; } summary{ cursor:pointer; color:var(--blue); font-weight:600; }
+.reset{ background:none; border:none; color:var(--muted); text-decoration:underline; font:inherit; font-size:0.85rem; cursor:pointer; padding:0; }
+
+</style>
+</head>
+<body data-key="quad-treino">
+<div class="wrap">
+<header class="top">
+  <p class="brand">Guia de Estudos</p>
+  <h1>Treino de funções quadráticas</h1>
+  <p class="lede">Uma sessão para cada lista de exercícios do guia. As questões são sorteadas: faça quantas quiser. Pode digitar decimais com vírgula (2,5) ou frações (3/2).</p>
+</header>
+<nav class="tabs" role="tablist" aria-label="Sessões">
+  <button role="tab" data-tab="s1">1. Construção do gráfico</button>
+  <button role="tab" data-tab="s2">2. Estudo do sinal</button>
+  <button role="tab" data-tab="s3">3. Lei de formação</button>
+  <button role="tab" data-tab="s4">4. Problemas</button>
+  <button role="tab" data-tab="s5">Tudo misturado</button>
+</nav>
+<!-- painéis gerados pelo script -->
+<div id="panels"></div>
+<footer>Guia de Estudos. Os acertos ficam guardados só neste navegador.</footer>
+</div>
+
+<script>
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const cssv=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const MINUS='\u2212';
+const ri=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+const pick=arr=>arr[Math.floor(Math.random()*arr.length)];
+const shuffle=arr=>{const a=arr.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+function num(v,d=2){ if(!isFinite(v)) return '—'; const p=Math.pow(10,d); let r=Math.round(v*p)/p; if(Math.abs(r)<1e-12) r=0; return (r<0?MINUS:'')+String(Math.abs(r)).replace('.',','); }
+function isInt(v){ return Math.abs(v-Math.round(v))<1e-9; }
+function frac(v){
+  if(!isFinite(v)) return '—';
+  if(isInt(v)) return num(Math.round(v));
+  if(isInt(v*100)) { /* decimal curto: mostra decimal */ if(isInt(v*4)||isInt(v*10)) return num(v); }
+  for(let q=2;q<=64;q++){ const p=Math.round(v*q); if(Math.abs(p/q-v)<1e-9) return (p<0?MINUS:'')+Math.abs(p)+'/'+q; }
+  return num(v);
+}
+const par=v=> v<0 ? '('+frac(v)+')' : frac(v);
+function poly(a,b,c,x='x'){
+  const t=[];
+  const add=(k,pw)=>{ if(Math.abs(k)<1e-12) return; const s=k<0?MINUS:'+'; const m=Math.abs(k); const ms=frac(m);
+    let body; if(pw===0) body=ms; else { const co=Math.abs(m-1)<1e-12?'':(isInt(m)||ms.indexOf('/')<0?ms:'('+ms+')'); body=co+x+(pw===2?'²':''); }
+    t.push([s,body]); };
+  add(a,2); add(b,1); add(c,0);
+  if(!t.length) return '0';
+  return t.map((u,i)=> i===0 ? (u[0]===MINUS?MINUS:'')+u[1] : ' '+u[0]+' '+u[1]).join('');
+}
+function parseNum(s){
+  s=String(s==null?'':s).trim().replace(/[\u2212\u2013\u2014]/g,'-').replace(/\s+/g,'');
+  if(!s) return NaN; s=s.replace(/,/g,'.');
+  const m=s.match(/^([-+]?(?:\d+\.?\d*|\.\d+))\/([-+]?(?:\d+\.?\d*|\.\d+))$/);
+  if(m){ const q=parseFloat(m[2]); return q===0?NaN:parseFloat(m[1])/q; }
+  if(/^[-+]?(?:\d+\.?\d*|\.\d+)$/.test(s)) return parseFloat(s);
+  return NaN;
+}
+const near=(u,v,tol=0.011)=>isFinite(u)&&Math.abs(u-v)<=tol;
+const F=(n,d)=>`<span class="fr"><span>${n}</span><span>${d}</span></span>`;
+
+function quadInfo(a,b,c){
+  const xv=-b/(2*a), f=x=>a*x*x+b*x+c, yv=f(xv), D=b*b-4*a*c;
+  let roots=[];
+  if(Math.abs(D)<1e-9) roots=[xv];
+  else if(D>0){ const s=Math.sqrt(D); roots=[(-b+s)/(2*a),(-b-s)/(2*a)]; }
+  const sorted=roots.slice().sort((p,q)=>p-q);
+  return {a,b,c,xv,yv,D,f,roots,sorted};
+}
+
+/* Passos do livro em texto (usado no Explorador e no Treino) */
+function stepsHTML(a,b,c){
+  const q=quadInfo(a,b,c);
+  const nb = b<0 ? MINUS+'('+frac(b)+')' : (b===0?'0':MINUS+frac(b));
+  const s1=`x<sub>v</sub> = ${F(MINUS+'b','2a')} = ${F(nb,'2·'+par(a))} = <b>${frac(q.xv)}</b><br>
+    y<sub>v</sub> = f(${frac(q.xv)}) = <b>${frac(q.yv)}</b> &nbsp;<span class="muted small">(ou y<sub>v</sub> = ${F(MINUS+'Δ','4a')})</span><br>
+    Vértice: <b>V(${frac(q.xv)}, ${frac(q.yv)})</b>`;
+  let s2=`Δ = b² ${MINUS} 4ac = ${par(b)}² ${MINUS} 4·${par(a)}·${par(c)} = <b>${frac(q.D)}</b><br>`;
+  if(q.D>1e-9){
+    const sq=Math.sqrt(q.D), sqs=isInt(sq)?frac(sq):'√'+frac(q.D);
+    const nbx = b<0? MINUS+'('+frac(b)+')' : MINUS+frac(b);
+    s2+=`x = ${F(nbx+' ± '+sqs,'2·'+par(a))} &nbsp;→&nbsp; x<sub>1</sub> = <b>${isInt(q.roots[0]*64)?frac(q.roots[0]):'≈ '+num(q.roots[0])}</b> e x<sub>2</sub> = <b>${isInt(q.roots[1]*64)?frac(q.roots[1]):'≈ '+num(q.roots[1])}</b>`;
+  } else if(Math.abs(q.D)<=1e-9){
+    s2+=`Δ = 0: um único zero, x = <b>${frac(q.xv)}</b>. A parábola só encosta no eixo x, no vértice.`;
+  } else {
+    s2+=`Δ &lt; 0: <b>não há zeros reais</b>. A parábola não toca o eixo x, mas o gráfico existe: use V, C e D.`;
+  }
+  const s3=`C(0, ${frac(c)}): onde a parábola corta o eixo y.<br>D é o espelho de C em relação à reta x = ${frac(q.xv)}: <b>D(${frac(2*q.xv)}, ${frac(c)})</b>${Math.abs(q.xv)<1e-9?' (aqui D coincide com C)':''}`;
+  const s4=`a = ${frac(a)} ${a>0?'&gt; 0: concavidade para <b>cima</b>':'&lt; 0: concavidade para <b>baixo</b>'}. Ligue os pontos com uma curva suave, simétrica em relação à reta x = ${frac(q.xv)}.`;
+  return [s1,s2,s3,s4];
+}
+
+/* Frases do estudo do sinal */
+function signSentences(a,b,c){
+  const q=quadInfo(a,b,c); const r=q.sorted.map(v=>isInt(v*64)?frac(v):num(v));
+  let pos,neg,nul;
+  if(q.sorted.length===2){
+    const out=`x &lt; ${r[0]} ou x &gt; ${r[1]}`, inn=`${r[0]} &lt; x &lt; ${r[1]}`;
+    pos=a>0?out:inn; neg=a>0?inn:out; nul=`x = ${r[0]} ou x = ${r[1]}`;
+  } else if(q.sorted.length===1){
+    nul=`x = ${r[0]}`; pos=a>0?`x ≠ ${r[0]}`:'nenhum x'; neg=a>0?'nenhum x':`x ≠ ${r[0]}`;
+  } else { nul='nenhum x'; pos=a>0?'todo x real':'nenhum x'; neg=a>0?'nenhum x':'todo x real'; }
+  return {pos,neg,nul};
+}
+
+/* ---------- Plot em canvas ---------- */
+const PLOTS=[];
+class Plot{
+  constructor(canvas,opt={}){
+    this.c=canvas; this.ctx=canvas.getContext('2d'); this.pad=opt.pad??24;
+    this.v={xmin:-10,xmax:10,ymin:-10,ymax:10}; this.xname=opt.xname||'x'; this.yname=opt.yname||'y';
+    this.draw=()=>{}; PLOTS.push(this);
+    this.ro=new ResizeObserver(()=>{ this.resize(); this.redraw(); }); this.ro.observe(canvas);
+    this.resize();
+  }
+  resize(){ const r=this.c.getBoundingClientRect(), d=window.devicePixelRatio||1;
+    this.w=r.width; this.h=r.height; if(this.w<20) return;
+    this.c.width=Math.round(this.w*d); this.c.height=Math.round(this.h*d); this.ctx.setTransform(d,0,0,d,0,0); }
+  redraw(){ if(this.w>=20) this.draw(); }
+  setView(xmin,xmax,ymin,ymax){ this.v={xmin,xmax,ymin,ymax}; }
+  X(x){const v=this.v; return this.pad+(x-v.xmin)/(v.xmax-v.xmin)*(this.w-2*this.pad);}
+  Y(y){const v=this.v; return this.h-this.pad-(y-v.ymin)/(v.ymax-v.ymin)*(this.h-2*this.pad);}
+  ix(p){const v=this.v; return v.xmin+(p-this.pad)/(this.w-2*this.pad)*(v.xmax-v.xmin);}
+  iy(p){const v=this.v; return v.ymin+(this.h-this.pad-p)/(this.h-2*this.pad)*(v.ymax-v.ymin);}
+  font(sz=12,w=400){ return `${w} ${sz}px Lexend, "Segoe UI", system-ui, sans-serif`; }
+  clear(){ const g=this.ctx; g.clearRect(0,0,this.w,this.h); g.fillStyle=cssv('--card'); g.fillRect(0,0,this.w,this.h); }
+  grid(){
+    const g=this.ctx, v=this.v;
+    const ppx=(this.w-2*this.pad)/(v.xmax-v.xmin), ppy=(this.h-2*this.pad)/(v.ymax-v.ymin);
+    const L=[0.25,0.5,1,2,5,10,20,25,50,100,200,500,1000];
+    const gs=p=>L.find(s=>s*p>=9)||1000;
+    const ls=(p,s0)=>L.find(s=>s>=s0 && s*p>=30 && isInt(s/s0))||1000;
+    const gx=gs(ppx), gy=gs(ppy), lx=ls(ppx,gx), ly=ls(ppy,gy);
+    const grid=cssv('--grid'), strong=cssv('--grid-strong'), ink=cssv('--ink'), card=cssv('--card');
+    g.lineWidth=1;
+    for(let x=Math.ceil(v.xmin/gx)*gx; x<=v.xmax+1e-9; x+=gx){ g.strokeStyle=isInt(x/(gx*5))?strong:grid; g.beginPath(); g.moveTo(Math.round(this.X(x))+0.5,this.Y(v.ymin)); g.lineTo(Math.round(this.X(x))+0.5,this.Y(v.ymax)); g.stroke(); }
+    for(let y=Math.ceil(v.ymin/gy)*gy; y<=v.ymax+1e-9; y+=gy){ g.strokeStyle=isInt(y/(gy*5))?strong:grid; g.beginPath(); g.moveTo(this.X(v.xmin),Math.round(this.Y(y))+0.5); g.lineTo(this.X(v.xmax),Math.round(this.Y(y))+0.5); g.stroke(); }
+    const ax=this.Y(clamp(0,v.ymin,v.ymax)), ay=this.X(clamp(0,v.xmin,v.xmax));
+    g.strokeStyle=ink; g.fillStyle=ink; g.lineWidth=1.6;
+    g.beginPath(); g.moveTo(this.X(v.xmin)-6,ax); g.lineTo(this.X(v.xmax)+10,ax); g.stroke();
+    g.beginPath(); g.moveTo(ay,this.Y(v.ymin)+6); g.lineTo(ay,this.Y(v.ymax)-10); g.stroke();
+    const arrow=(x,y,dx,dy)=>{ g.beginPath(); g.moveTo(x+dx*8,y+dy*8); g.lineTo(x-dy*4,y+dx*4); g.lineTo(x+dy*4,y-dx*4); g.closePath(); g.fill(); };
+    arrow(this.X(v.xmax)+10,ax,1,0); arrow(ay,this.Y(v.ymax)-10,0,-1);
+    g.font=this.font(13,600); g.textAlign='right'; g.textBaseline='bottom';
+    g.fillText(this.xname,this.w-4,ax-5); g.textAlign='left'; g.textBaseline='top'; g.fillText(this.yname,ay+7,2);
+    g.font=this.font(10.5); g.textAlign='center'; g.textBaseline='top';
+    const below = ax+17 < this.h;
+    for(let x=Math.ceil(v.xmin/lx)*lx; x<=v.xmax+1e-9; x+=lx){ if(Math.abs(x)<1e-9) continue; const px=this.X(x);
+      g.beginPath(); g.moveTo(px,ax-3); g.lineTo(px,ax+3); g.stroke();
+      const s=num(x); const tw=g.measureText(s).width; const ty=below?ax+4:ax-16;
+      g.fillStyle=card; g.fillRect(px-tw/2-1.5,ty,tw+3,12); g.fillStyle=ink; g.fillText(s,px,ty); }
+    g.textAlign='right'; g.textBaseline='middle';
+    for(let y=Math.ceil(v.ymin/ly)*ly; y<=v.ymax+1e-9; y+=ly){ if(Math.abs(y)<1e-9) continue; const py=this.Y(y);
+      g.beginPath(); g.moveTo(ay-3,py); g.lineTo(ay+3,py); g.stroke();
+      const s=num(y); const tw=g.measureText(s).width; const left=ay-5-tw>2; const tx=left?ay-5:ay+5+tw;
+      g.fillStyle=card; g.fillRect(tx-tw-1.5,py-6,tw+3,12); g.fillStyle=ink; g.fillText(s,tx,py); }
+    if(v.xmin<=0&&v.xmax>=0&&v.ymin<=0&&v.ymax>=0){ g.textAlign='right'; g.textBaseline='top'; g.fillText('0',ay-4,ax+3); }
+  }
+  curve(f,color,opt={}){
+    const g=this.ctx, v=this.v; const x0=opt.from??v.xmin, x1=opt.to??v.xmax; const N=Math.max(200,Math.round(this.w*1.5));
+    g.save(); g.beginPath(); g.rect(this.pad-2,this.pad-2,this.w-2*this.pad+4,this.h-2*this.pad+4); g.clip();
+    g.lineWidth=opt.width??2.6; g.lineJoin='round'; g.lineCap='round'; g.setLineDash(opt.dash||[]);
+    if(opt.signed){
+      const cp=cssv('--green'), cn=cssv('--red');
+      let prev=null;
+      for(let i=0;i<=N;i++){ const x=x0+(x1-x0)*i/N, y=f(x); const pt=[this.X(x),this.Y(clamp(y,v.ymin-1e3,v.ymax+1e3))];
+        if(prev){ const ym=f(x-(x1-x0)/(2*N)); g.strokeStyle= ym>=0?cp:cn; g.beginPath(); g.moveTo(prev[0],prev[1]); g.lineTo(pt[0],pt[1]); g.stroke(); }
+        prev=pt; }
+    } else {
+      g.strokeStyle=color; g.beginPath(); let started=false;
+      for(let i=0;i<=N;i++){ const x=x0+(x1-x0)*i/N, y=f(x); const py=this.Y(y);
+        if(!isFinite(py)||py<-4*this.h||py>5*this.h){ started=false; continue; }
+        if(!started){ g.moveTo(this.X(x),py); started=true; } else g.lineTo(this.X(x),py); }
+      g.stroke();
+    }
+    g.restore();
+  }
+  seg(x1,y1,x2,y2,color,opt={}){ const g=this.ctx; g.save(); g.strokeStyle=color; g.lineWidth=opt.width??1.5; g.setLineDash(opt.dash||[]); g.globalAlpha=opt.alpha??1;
+    g.beginPath(); g.moveTo(this.X(x1),this.Y(y1)); g.lineTo(this.X(x2),this.Y(y2)); g.stroke(); g.restore(); }
+  pt(x,y,color,label,opt={}){
+    const g=this.ctx, px=this.X(x), py=this.Y(y); const r=opt.r??5.5;
+    g.save(); g.fillStyle=opt.hollow?cssv('--card'):color; g.strokeStyle=opt.hollow?color:cssv('--card'); g.lineWidth=opt.hollow?2.2:2;
+    g.beginPath(); g.arc(px,py,r,0,2*Math.PI); g.fill(); g.stroke();
+    if(opt.ring){ g.strokeStyle=color; g.globalAlpha=0.35; g.lineWidth=2; g.beginPath(); g.arc(px,py,r+6,0,2*Math.PI); g.stroke(); g.globalAlpha=1; }
+    if(label){ g.font=this.font(12.5,600); const dx=opt.dx??9, dy=opt.dy??-9; g.textAlign=dx>=0?'left':'right'; g.textBaseline=dy<0?'bottom':'top';
+      const tw=g.measureText(label).width; let tx=px+dx, ty=py+dy;
+      if(dx>=0 && tx+tw>this.w-2){ tx=px-9; g.textAlign='right'; }
+      if(dx<0 && tx-tw<2){ tx=px+9; g.textAlign='left'; }
+      if(dy<0 && ty-15<2){ ty=py+9; g.textBaseline='top'; }
+      if(dy>=0 && ty+15>this.h-2){ ty=py-9; g.textBaseline='bottom'; }
+      const bx = g.textAlign==='left'?tx:tx-tw, by = g.textBaseline==='bottom'?ty-14:ty;
+      g.fillStyle=cssv('--card'); g.globalAlpha=0.85; g.fillRect(bx-2,by-1,tw+4,16); g.globalAlpha=1;
+      g.fillStyle=opt.labelColor||cssv('--ink'); g.fillText(label,tx,ty); }
+    g.restore();
+  }
+  text(x,y,s,color,opt={}){ const g=this.ctx; g.save(); g.font=this.font(opt.size??12.5,opt.weight??600); g.fillStyle=color; g.textAlign=opt.align||'left'; g.textBaseline=opt.base||'middle'; g.fillText(s,this.X(x)+(opt.dx||0),this.Y(y)+(opt.dy||0)); g.restore(); }
+  enableDrag(handles,onMove,onEnd){
+    const c=this.c; c.classList.add('drag'); let act=null;
+    const pos=e=>{const r=c.getBoundingClientRect(); return [e.clientX-r.left,e.clientY-r.top];};
+    const find=(px,py)=>{ let best=null,bd=24; for(const h of handles()){ const d=Math.hypot(this.X(h.x)-px,this.Y(h.y)-py); if(d<bd){bd=d;best=h;} } return best; };
+    c.addEventListener('pointerdown',e=>{ const [px,py]=pos(e); const h=find(px,py); if(h){ act=h.id; c.setPointerCapture(e.pointerId); c.style.cursor='grabbing'; e.preventDefault(); onMove(act,this.ix(px),this.iy(py)); } });
+    c.addEventListener('pointermove',e=>{ const [px,py]=pos(e); if(act){ onMove(act,this.ix(px),this.iy(py)); } else c.style.cursor=find(px,py)?'grab':'default'; });
+    const end=()=>{ if(act){ act=null; c.style.cursor='default'; onEnd&&onEnd(); } };
+    c.addEventListener('pointerup',end); c.addEventListener('pointercancel',end);
+  }
+}
+/* Janela automática em torno de pontos importantes */
+function fitView(P,pts,opt={}){
+  const xs=pts.map(p=>p[0]), ys=pts.map(p=>p[1]);
+  let x0=Math.min(...xs,0), x1=Math.max(...xs,0), y0=Math.min(...ys,0), y1=Math.max(...ys,0);
+  const mx=opt.margin??2; x0-=mx; x1+=mx; y0-=mx; y1+=mx;
+  const minS=opt.min??12;
+  if(x1-x0<minS){ const m=(x0+x1)/2; x0=m-minS/2; x1=m+minS/2; }
+  if(y1-y0<minS){ const m=(y0+y1)/2; y0=m-minS/2; y1=m+minS/2; }
+  if(opt.open){ const s=(y1-y0)*0.25; if(opt.open>0) y1+=s; else y0-=s; }
+  if(opt.square){ const s=Math.max(x1-x0,y1-y0); let m=(x0+x1)/2; x0=m-s/2; x1=m+s/2; m=(y0+y1)/2; y0=m-s/2; y1=m+s/2; }
+  P.setView(Math.floor(x0),Math.ceil(x1),Math.floor(y0),Math.ceil(y1));
+}
+/* Redesenha tudo quando o tema muda */
+try{ matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>PLOTS.forEach(p=>p.redraw())); }catch(e){}
+/* Abas */
+function setupTabs(onShow){
+  const btns=$$('.tabs button');
+  const show=id=>{ btns.forEach(b=>b.setAttribute('aria-selected',String(b.dataset.tab===id)));
+    $$('.panel').forEach(p=>p.hidden=p.id!==id);
+    requestAnimationFrame(()=>{ PLOTS.forEach(p=>{p.resize();p.redraw();}); onShow&&onShow(id); });
+    try{ localStorage.setItem(document.body.dataset.key+'-tab',id); }catch(e){} };
+  btns.forEach(b=>b.addEventListener('click',()=>show(b.dataset.tab)));
+  let first=btns[0].dataset.tab; try{ const s=localStorage.getItem(document.body.dataset.key+'-tab'); if(s && $('#'+s)) first=s; }catch(e){}
+  show(first);
+}
+
+/* ---------- Pontuação ---------- */
+const KEY='quad-treino-v1';
+let STATS={}; try{ STATS=JSON.parse(localStorage.getItem(KEY)||'{}')||{}; }catch(e){ STATS={}; }
+function saveStats(){ try{ localStorage.setItem(KEY,JSON.stringify(STATS)); }catch(e){} }
+function score(id,ok){ const s=STATS[id]||{n:0,ok:0,seq:0,best:0}; s.n++; if(ok){s.ok++;s.seq++;s.best=Math.max(s.best,s.seq);} else s.seq=0; STATS[id]=s; saveStats(); showScore(id); }
+function showScore(id){ const s=STATS[id]||{n:0,ok:0,seq:0,best:0}; const el=$('#'+id+' .score');
+  el.innerHTML=`<span><b>${s.ok}</b> de <b>${s.n}</b> certas de primeira</span><span>Sequência atual: <b>${s.seq}</b></span><span>Melhor sequência: <b>${s.best}</b></span><button class="reset" type="button">zerar</button>`;
+  $('.reset',el).onclick=()=>{ delete STATS[id]; saveStats(); showScore(id); }; }
+
+/* ---------- Ajudantes de formulário ---------- */
+const fld=(name,label,unit='')=>`<label class="fld" data-f="${name}"><span class="lbl">${label}</span><span class="inrow"><input name="${name}" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="done"><span class="unit">${unit}</span><span class="mk" aria-hidden="true"></span></span></label>`;
+const V=(root,name)=>parseNum($(`[name="${name}"]`,root).value);
+const raw=(root,name)=>$(`[name="${name}"]`,root).value.trim();
+function mk(root,name,ok){ const l=$(`[data-f="${name}"]`,root); l.classList.remove('ok','bad'); l.classList.add(ok?'ok':'bad'); }
+function seg(name,opts){ return `<div class="seg" data-seg="${name}">${opts.map(([v,t])=>`<button type="button" data-v="${v}" aria-pressed="false">${t}</button>`).join('')}</div>`; }
+function wireSeg(root){ $$('.seg',root).forEach(s=>s.addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; $$('button',s).forEach(x=>x.setAttribute('aria-pressed',String(x===b))); s.classList.remove('ok','bad'); })); }
+const segVal=(root,name)=>{ const b=$(`[data-seg="${name}"] button[aria-pressed="true"]`,root); return b?b.dataset.v:null; };
+function segMark(root,name,ok){ const s=$(`[data-seg="${name}"]`,root); s.classList.remove('ok','bad'); s.classList.add(ok?'ok':'bad'); }
+function zerosOK(q,root,pre='z'){
+  const none=$(`[name="${pre}none"]`,root).checked, u=V(root,pre+'1'), w=V(root,pre+'2');
+  if(q.roots.length===0) return none;
+  if(none) return false;
+  if(q.roots.length===1){ const r=q.roots[0]; return (near(u,r)&&(isNaN(w)||near(w,r)))||(isNaN(u)&&near(w,r)); }
+  const [r1,r2]=q.roots; return (near(u,r1)&&near(w,r2))||(near(u,r2)&&near(w,r1));
+}
+const zerosHTML=(pre='z')=>`<div class="fields">${fld(pre+'1','zero x₁')}${fld(pre+'2','zero x₂')}</div><label class="check"><input type="checkbox" name="${pre}none"> não há zeros reais</label>`;
+function solSteps(a,b,c){ const st=stepsHTML(a,b,c), nm=['1º passo: vértice','2º passo: zeros','3º passo: C e D','Concavidade e desenho']; return `<ol class="steps">${st.map((s,i)=>`<li class="on"><div class="t">${nm[i]}</div><div class="body">${s}</div></li>`).join('')}</ol>`; }
+function miniPlot(el,draw,opt={}){ const cv=document.createElement('canvas'); cv.className='plot'; el.appendChild(cv); const P=new Plot(cv,opt); P.draw=()=>draw(P); P.resize(); P.redraw(); return P; }
+
+/* ---------- Gerador de funções "boas" ---------- */
+function genQuad(kindWanted){
+  const r=Math.random(); const kind=kindWanted||(r<0.6?'2':(r<0.8?'1':'0'));
+  for(let t=0;t<500;t++){
+    const a=pick([1,1,1,-1,-1,-1,2,-2]); let b,c;
+    if(kind==='2'){ const x1=ri(-6,6), x2=ri(-6,6); if(x1===x2||(x1+x2)%2!==0) continue; if(Math.abs(a)===2&&Math.abs(x1-x2)>4) continue; b=-a*(x1+x2); c=a*x1*x2; }
+    else if(kind==='1'){ const h=ri(-5,5); b=-2*a*h; c=a*h*h; }
+    else { const h=ri(-4,4), k=ri(1,6)*Math.sign(a); b=-2*a*h; c=a*h*h+k; }
+    if(Math.abs(c)>20||Math.abs(b)>14) continue;
+    return {a,b,c};
+  }
+  return {a:1,b:-2,c:-3};
+}
+function quadPlot(P,q,opt={}){
+  const pts=[[q.xv,q.yv],[0,q.c],[2*q.xv,q.c]].concat(q.roots.map(r=>[r,0]));
+  fitView(P,pts,{open:q.a>0?1:-1}); P.clear(); P.grid();
+  P.seg(q.xv,P.v.ymin,q.xv,P.v.ymax,cssv('--muted'),{dash:[6,5],width:1.2});
+  if(opt.signed) P.curve(q.f,null,{signed:true,width:3.2}); else P.curve(q.f,cssv('--blue'),{width:3});
+  P.pt(q.xv,q.yv,cssv('--red'),`V(${frac(q.xv)}, ${frac(q.yv)})`,{dy:q.a>0?10:-10});
+  q.sorted.forEach((r,i)=>P.pt(r,0,cssv('--green'),opt.signed?'x = '+frac(r):'',{hollow:!!opt.signed,dx:i===0?-9:9,dy:q.a>0?-9:9}));
+  if(!opt.signed){ P.pt(0,q.c,cssv('--orange'),'C',{dx:9}); if(Math.abs(q.xv)>1e-9) P.pt(2*q.xv,q.c,cssv('--orange'),'D',{dx:9}); }
+}
+
+/* ===== Sessão 1: construção do gráfico ===== */
+function genS1(){
+  const {a,b,c}=genQuad(); const q=quadInfo(a,b,c);
+  const Q={firstTry:true};
+  Q.mount=el=>{ el.innerHTML=`<p class="q">Construa o gráfico de <span class="m">f(x) = ${poly(a,b,c)}</span>. Preencha os dados:</p>
+    <p class="small muted" style="margin:0 0 4px">Concavidade</p>${seg('conc',[['cima','Para cima'],['baixo','Para baixo']])}
+    <div class="fields">${fld('xv','x do vértice (xᵥ)')}${fld('yv','y do vértice (yᵥ)')}${fld('D','Δ')}</div>
+    ${zerosHTML()}
+    <div class="fields">${fld('cy','C = (0, ?)')}${fld('dx','D = (?, c)')}</div>
+    <div class="out"></div>`; wireSeg(el); Q.el=el; };
+  Q.check=()=>{ const el=Q.el, w=[];
+    const okc=segVal(el,'conc')===(a>0?'cima':'baixo'); segMark(el,'conc',okc); if(!okc) w.push('Concavidade: olhe o sinal de a.');
+    const o1=near(V(el,'xv'),q.xv); mk(el,'xv',o1); if(!o1) w.push(`xᵥ = −b ÷ (2a). Cuidado com o sinal de b.`);
+    const o2=near(V(el,'yv'),q.yv); mk(el,'yv',o2); if(!o2) w.push('yᵥ: substitua o xᵥ em f(x). É mais fácil que −Δ/4a.');
+    const o3=near(V(el,'D'),q.D); mk(el,'D',o3); if(!o3) w.push('Δ = b² − 4ac. Quando a e c têm sinais opostos, −4ac fica positivo.');
+    const o4=zerosOK(q,el); mk(el,'z1',o4); mk(el,'z2',o4); if(!o4) w.push(q.roots.length? 'Zeros: confira substituindo cada um em f(x); tem que dar 0.' : 'Zeros: veja o sinal de Δ.');
+    const o5=near(V(el,'cy'),c); mk(el,'cy',o5); if(!o5) w.push('C é onde a parábola corta o eixo y: é o próprio c.');
+    const o6=near(V(el,'dx'),2*q.xv); mk(el,'dx',o6); if(!o6) w.push('D é o espelho de C: o x de D é 2·xᵥ.');
+    const ok=okc&&o1&&o2&&o3&&o4&&o5&&o6;
+    return {ok,done:ok,msg: ok?'Tudo certo! Veja o gráfico abaixo.':'Quase. Confira os campos marcados:<ul>'+w.map(x=>'<li>'+x+'</li>').join('')+'</ul>'}; };
+  Q.reveal=()=>{ const out=$('.out',Q.el); out.innerHTML='<div class="qgrid sol"><div class="pl"></div><div>'+solSteps(a,b,c)+'</div></div>'; miniPlot($('.pl',out),P=>quadPlot(P,q)); };
+  return Q;
+}
+
+/* ===== Sessão 2: estudo do sinal ===== */
+function genS2(){
+  const r=Math.random(); const {a,b,c}=genQuad(r<0.6?'2':(r<0.8?'1':'0')); const q=quadInfo(a,b,c);
+  const Q={firstTry:true,stage:0};
+  const s=signSentences(a,b,c); const ask=Math.random()<0.5?'pos':'neg';
+  const R=q.sorted.map(frac);
+  let pool;
+  if(q.sorted.length===2){ const [x1,x2]=q.sorted; const out=`x &lt; ${R[0]} ou x &gt; ${R[1]}`, inn=`${R[0]} &lt; x &lt; ${R[1]}`;
+    pool=[out,inn,`x &lt; ${R[0]} e x &gt; ${R[1]}`,'todo x real'];
+    if(x1!==0 && -x1!==x2) pool.push(`x &lt; ${frac(-x1)} ou x &gt; ${R[1]}`, `${frac(-x1)} &lt; x &lt; ${R[1]}`);
+    if(x2!==0 && -x2!==x1) pool.push(`x &lt; ${R[0]} ou x &gt; ${frac(-x2)}`);
+    pool.push(`x &lt; ${R[0]} ou 0 &gt; ${R[1]}`);
+  } else if(q.sorted.length===1){ pool=[`x ≠ ${R[0]}`,`x = ${R[0]}`,'todo x real','nenhum x',`x &gt; ${R[0]}`,`x &lt; ${R[0]}`]; }
+  else { pool=['todo x real','nenhum x',`x ≠ ${frac(q.xv)}`,`x &gt; ${frac(q.xv)}`,'x &gt; 0']; }
+  const correct=s[ask]; const wrong=shuffle([...new Set(pool.filter(p=>p!==correct))]).slice(0,3); const opts=shuffle([correct,...wrong]);
+  const regs = q.sorted.length===2?3:(q.sorted.length===1?2:1);
+  const expect = regs===3 ? (a>0?['+','−','+']:['−','+','−']) : (regs===2 ? (a>0?['+','+']:['−','−']) : [a>0?'+':'−']);
+  Q.mount=el=>{ const rl = regs===3?['x₁','x₂']:(regs===2?['x₁ = x₂']:[]);
+    let nl='<div class="nline">'; for(let i=0;i<regs;i++){ nl+=`<button type="button" class="reg" data-s="?" aria-label="sinal do trecho ${i+1}">?</button>`; if(i<regs-1) nl+=`<span class="rt">${rl[i]}</span>`; } nl+='</div>';
+    el.innerHTML=`<p class="q">Estude o sinal de <span class="m">f(x) = ${poly(a,b,c)}</span>.</p>
+      <div class="stage"><p><b>Parte 1.</b> Quais são os zeros?</p>${zerosHTML()}</div>
+      <div class="stage locked" data-st="1"><p><b>Parte 2.</b> Toque em cada trecho da reta para marcar o sinal de f(x) (+ ou −).</p>${nl}<p class="small muted">${regs===1?'Sem zeros: a reta inteira tem um sinal só.':'Os trechos estão separados pelos zeros, do menor para o maior.'}</p></div>
+      <div class="stage locked" data-st="2"><p><b>Parte 3.</b> Qual é a resposta bem escrita para <b>f(x) ${ask==='pos'?'&gt;':'&lt;'} 0</b>?</p>
+        <div class="opts">${opts.map((o,i)=>`<label><input type="radio" name="op" value="${i}"> <span>para ${o}</span></label>`).join('')}</div></div>
+      <div class="out"></div>`;
+    $$('.reg',el).forEach(bt=>bt.onclick=()=>{ const nx={'?':'+','+':'−','−':'+'}[bt.dataset.s]; bt.dataset.s=nx; bt.textContent=nx; $('.nline',el).classList.remove('ok','bad'); });
+    Q.el=el; };
+  Q.check=()=>{ const el=Q.el;
+    if(Q.stage===0){ const ok=zerosOK(q,el); mk(el,'z1',ok); mk(el,'z2',ok);
+      if(ok){ Q.stage=1; $('[data-st="1"]',el).classList.remove('locked'); return {ok:true,done:false,msg:'Zeros certos. Agora a parte 2.'}; }
+      return {ok:false,done:false,msg: q.roots.length?'Confira os zeros: substitua cada um em f(x), tem que dar 0. Lembre do sinal (Cuidado 3).':'Calcule Δ = b² − 4ac antes. Se for negativo, não há zeros.'}; }
+    if(Q.stage===1){ const got=$$('.reg',el).map(b=>b.dataset.s); const ok=got.every((g,i)=>g===expect[i]); $('.nline',el).classList.add(ok?'ok':'bad');
+      if(ok){ Q.stage=2; $('[data-st="2"]',el).classList.remove('locked'); return {ok:true,done:false,msg:'Sinais certos. Falta a parte 3.'}; }
+      return {ok:false,done:false,msg:`a = ${frac(a)} ${a>0?'&gt; 0: parábola para cima':'&lt; 0: parábola para baixo'}. ${regs===3?'Fora dos zeros o sinal é o mesmo de a; entre eles, o contrário.':'Pense no desenho: onde a parábola fica acima ou abaixo do eixo x?'}`}; }
+    const ch=$('input[name="op"]:checked',el); if(!ch) return {ok:false,done:false,msg:'Escolha uma das opções.',noPenalty:true};
+    const ok=opts[+ch.value]===correct; $('.opts',el).classList.remove('ok','bad'); $('.opts',el).classList.add(ok?'ok':'bad');
+    return {ok,done:ok,msg: ok?'Perfeito! A resposta completa está abaixo.':'Não é essa. Lembre: “fora dos zeros” usa <b>ou</b>; “entre os zeros” usa a desigualdade dupla. E a resposta precisa falar de x (Cuidado 4).'}; };
+  Q.reveal=()=>{ const out=$('.out',Q.el); out.innerHTML=`<div class="qgrid sol"><div class="pl"></div><div><p class="sent"><span class="zero">f(x) = 0</span> para ${s.nul}</p><p class="sent"><span class="pos">f(x) &gt; 0</span> para ${s.pos}</p><p class="sent"><span class="neg">f(x) &lt; 0</span> para ${s.neg}</p></div></div>`; miniPlot($('.pl',out),P=>quadPlot(P,q,{signed:true})); };
+  return Q;
+}
+
+/* ===== Sessão 3: lei de formação ===== */
+function genS3(){
+  const r=Math.random(); let a,b,c,mark=[],kind,hint;
+  for(let t=0;t<500;t++){
+    if(r<0.55){ kind='A'; a=pick([1,-1,2,-2,1,-1]); const x1=ri(-6,5), x2=ri(x1+1,6); if(x1===0||x2===0) continue; b=-a*(x1+x2); c=a*x1*x2; if(Math.abs(c)>10||Math.abs(a*((x2-x1)/2)**2)>12) continue;
+      mark=[[x1,0,'A'],[x2,0,'B'],[0,c,'C']]; hint='Leia os zeros (onde corta o eixo x) e o c (onde corta o eixo y). Depois: a = c ÷ (x₁·x₂) e f(x) = a(x − x₁)(x − x₂).'; break; }
+    else if(r<0.8){ kind='B'; a=pick([1,-1]); const rr=pick([-6,-4,-2,2,4,6]); b=-a*rr; c=0; const xv=rr/2, yv=-a*rr*rr/4;
+      mark=[[0,0,'O'],[rr,0,'B'],[xv,yv,'V']]; hint='A parábola passa pela origem: c = 0 e a conta a = c ÷ (x₁·x₂) não funciona. Use f(x) = a·x·(x − x₂) e o vértice V para achar a.'; break; }
+    else { kind='C'; a=pick([1,-1]); const h=ri(-3,3), k=ri(1,4)*Math.sign(a); b=-2*a*h; c=a*h*h+k; if(Math.abs(c)>9) continue;
+      mark=[[h,k,'V'],[h+(h>=0?-1:1)*2,k+4*a,'P']]; if(h!==0) mark.push([0,c,'C']);
+      hint='Não há zeros! Use a forma do vértice: f(x) = a(x − xᵥ)² + yᵥ, e outro ponto para achar a.'; break; }
+  }
+  const q=quadInfo(a,b,c); const Q={firstTry:true};
+  Q.mount=el=>{ el.innerHTML=`<div class="qgrid"><div class="pl"></div><div>
+      <p class="q">Encontre a lei de formação <span class="m">f(x) = ax² + bx + c</span> da parábola. Os pontos marcados estão em cima das linhas da grade.</p>
+      <div class="fields">${fld('a','a')}${fld('b','b')}${fld('c','c')}</div>
+      <details><summary>Dica</summary><p class="small">${hint}</p></details>
+      <div class="out"></div></div></div>`;
+    miniPlot($('.pl',el),P=>{ const pts=mark.map(m=>[m[0],m[1]]).concat([[q.xv,q.yv]]); fitView(P,pts,{margin:2,min:10,open:a>0?1:-1}); P.clear(); P.grid(); P.curve(q.f,cssv('--violet'),{width:3});
+      mark.forEach(m=>P.pt(m[0],m[1],m[2]==='V'?cssv('--red'):(m[2]==='P'||m[2]==='C'?cssv('--orange'):cssv('--green')),m[2],{dx:9,dy:-9})); if(kind!=='A') P.seg(q.xv,0,q.xv,q.yv,cssv('--muted'),{dash:[5,4]}); });
+    Q.el=el; };
+  Q.check=()=>{ const el=Q.el; const oa=near(V(el,'a'),a), ob=near(V(el,'b'),b), oc=near(V(el,'c'),c); mk(el,'a',oa); mk(el,'b',ob); mk(el,'c',oc);
+    const ok=oa&&ob&&oc; const w=[]; if(!oc) w.push(kind==='B'?'c: a parábola passa pela origem.':'c: onde a parábola corta o eixo y?'); if(!oa) w.push('a: use a dica.'); if(!ob) w.push('b: faça a distributiva com cuidado; confira usando um ponto do gráfico.');
+    return {ok,done:ok,msg: ok?'Isso mesmo!':'Confira:<ul>'+w.map(x=>'<li>'+x+'</li>').join('')+'</ul>'}; };
+  Q.reveal=()=>{ let s='';
+    if(kind==='A'){ const [A,B,C]=mark; s=`Zeros ${frac(A[0])} e ${frac(B[0])}; c = ${frac(c)}.<br>a = ${F('c','x₁·x₂')} = ${F(frac(c),par(A[0])+'·'+par(B[0]))} = <b>${frac(a)}</b><br>f(x) = ${frac(a)==='1'?'':frac(a)==='−1'?MINUS:par(a)}(x ${MINUS} ${par(A[0])})(x ${MINUS} ${par(B[0])}) = <b>${poly(a,b,c)}</b>`; }
+    else if(kind==='B'){ const B=mark[1], Vv=mark[2]; s=`Zeros 0 e ${frac(B[0])}, então c = 0 e f(x) = a·x·(x ${MINUS} ${par(B[0])}).<br>No vértice V(${frac(Vv[0])}, ${frac(Vv[1])}): ${frac(Vv[1])} = a·${par(Vv[0])}·(${frac(Vv[0])} ${MINUS} ${par(B[0])}) &nbsp;→&nbsp; <b>a = ${frac(a)}</b><br>f(x) = <b>${poly(a,b,c)}</b>`; }
+    else { const Vv=mark[0], Pp=mark[1]; s=`Vértice V(${frac(Vv[0])}, ${frac(Vv[1])}): f(x) = a(x ${MINUS} ${par(Vv[0])})² + ${par(Vv[1])}.<br>Em P(${frac(Pp[0])}, ${frac(Pp[1])}): ${frac(Pp[1])} = a·(${frac(Pp[0])} ${MINUS} ${par(Vv[0])})² + ${par(Vv[1])} &nbsp;→&nbsp; <b>a = ${frac(a)}</b><br>Desenvolvendo: f(x) = <b>${poly(a,b,c)}</b>`; }
+    $('.out',Q.el).innerHTML=`<div class="note sol">${s}</div>`; };
+  return Q;
+}
+
+/* ===== Sessão 4: problemas ===== */
+const T4=[
+  ()=>{ const k=pick([1,2,5]); const T=k===5?pick([2,4,6]):pick([4,6,8,10]); const a=-k,b=k*T;
+    return {txt:`Uma bola é chutada do chão e sua altura, em metros, é <span class="m">h(t) = ${poly(a,b,0,'t')}</span>, com t em segundos.`,
+      f:[['tv','Instante da altura máxima','s',T/2],['hv','Altura máxima','m',k*T*T/4],['tc','Instante em que volta ao chão','s',T]],
+      sol:`t<sub>v</sub> = ${F(MINUS+'b','2a')} = ${F(MINUS+b,'2·('+frac(a)+')')} = ${frac(T/2)} s.<br>h(${frac(T/2)}) = ${frac(k*T*T/4)} m.<br>${poly(a,b,0,'t')} = 0 → t·(${poly(0,a,b,'t')}) = 0 → t = 0 ou t = ${frac(T)} s.`, a,b,c:0,xn:'t',yn:'h'}; },
+  ()=>{ const r1=ri(1,4), r2=r1+pick([2,4,6]); const B=-(r1+r2), C=r1*r2; const m=(r1+r2)/2, tm=-(((r2-r1)/2)**2);
+    return {txt:`A temperatura de um alimento, em °C, durante um resfriamento é <span class="m">T(t) = ${poly(1,B,C,'t')}</span>, com t em minutos.`,
+      f:[['dur','Por quantos minutos T ≤ 0?','min',r2-r1],['tm','Em que instante a temperatura é mínima?','min',m],['Tm','Qual é a temperatura mínima?','°C',tm]],
+      sol:`Zeros: t = ${r1} e t = ${r2}. Como a &gt; 0, T ≤ 0 entre eles: ${r2} ${MINUS} ${r1} = ${r2-r1} min.<br>Mínimo no vértice: t<sub>v</sub> = ${frac(m)} min, T(${frac(m)}) = ${frac(tm)} °C.`, a:1,b:B,c:C,xn:'t',yn:'T'}; },
+  ()=>{ const r1=pick([10,20,30]), r2=r1+pick([20,40]); const B=r1+r2, C=-r1*r2; const xm=B/2, Lm=((r2-r1)/2)**2;
+    return {txt:`O lucro de uma loja ao vender x peças é <span class="m">L(x) = ${poly(-1,B,C)}</span> reais.`,
+      f:[['xm','Quantas peças dão o lucro máximo?','peças',xm],['Lm','Qual é o lucro máximo?','reais',Lm],['x1','A partir de quantas peças há lucro (L > 0)? Dê o menor zero.','peças',r1]],
+      sol:`x<sub>v</sub> = ${F(MINUS+B,'2·(−1)')} = ${xm} peças; L(${xm}) = ${Lm} reais.<br>Zeros: ${r1} e ${r2}. Como a &lt; 0, L &gt; 0 entre eles: ${r1} &lt; x &lt; ${r2}.`, a:-1,b:B,c:C,xn:'x',yn:'L'}; },
+  ()=>{ const P=pick([12,16,20,24,28,32,40]); const h=P/2;
+    return {txt:`Com ${P} m de cerca, quero cercar um canteiro retangular. Se um lado mede x, a área é <span class="m">A(x) = x(${h} ${MINUS} x)</span>.`,
+      f:[['x','Qual x dá a maior área?','m',P/4],['A','Qual é a maior área?','m²',P*P/16]],
+      sol:`A(x) = ${poly(-1,h,0)}. x<sub>v</sub> = ${F(MINUS+h,'2·(−1)')} = ${frac(P/4)} m (o canteiro é um quadrado!). A(${frac(P/4)}) = ${frac(P*P/16)} m².`, a:-1,b:h,c:0,xn:'x',yn:'A'}; },
+  ()=>{ const k=pick([1,2]), T=pick([4,6,8]); const a=-k,b=k*T; const h1=a+b, h2=4*a+2*b;
+    return {txt:`Uma bola sai do chão (h(0) = 0) e sua altura segue <span class="m">h(t) = at² + bt</span>. Após 1 s ela está a ${h1} m e após 2 s está a ${h2} m.`,
+      f:[['a','Coeficiente a','',a],['b','Coeficiente b','',b],['tv','Instante da altura máxima','s',T/2]],
+      sol:`h(1) = ${h1}: a + b = ${h1}.<br>h(2) = ${h2}: 4a + 2b = ${h2}, ou seja, 2a + b = ${h2/2}.<br>Subtraindo: a = ${h2/2-h1}, e b = ${b}. Então h(t) = ${poly(a,b,0,'t')} e t<sub>v</sub> = ${frac(T/2)} s.`, a,b,c:0,xn:'t',yn:'h'}; },
+];
+function genS4(){
+  const pb=pick(T4)(); const Q={firstTry:true};
+  Q.mount=el=>{ el.innerHTML=`<p class="q">${pb.txt}</p><div class="fields">${pb.f.map(f=>fld(f[0],f[1],f[2])).join('')}</div><div class="out"></div>`; Q.el=el; };
+  Q.check=()=>{ let ok=true; pb.f.forEach(f=>{ const o=near(V(Q.el,f[0]),f[3]); mk(Q.el,f[0],o); ok=ok&&o; });
+    return {ok,done:ok,msg: ok?'Certo!':'Confira os campos marcados. Altura/valor máximo é o y<sub>v</sub>; o instante é o x<sub>v</sub>; “volta ao chão” e “abaixo de zero” usam os zeros.'}; };
+  Q.reveal=()=>{ const out=$('.out',Q.el); out.innerHTML=`<div class="qgrid sol"><div class="pl"></div><div class="note">${pb.sol}</div></div>`;
+    const q=quadInfo(pb.a,pb.b,pb.c);
+    miniPlot($('.pl',out),P=>{ const pts=[[q.xv,q.yv],[0,pb.c]].concat(q.roots.map(r=>[r,0])); fitView(P,pts,{margin:1,min:4,open:pb.a>0?1:-1}); P.clear(); P.grid(); P.curve(q.f,cssv('--blue'),{width:3});
+      P.pt(q.xv,q.yv,cssv('--red'),`(${frac(q.xv)}, ${frac(q.yv)})`,{dy:pb.a>0?10:-10}); q.roots.forEach(r=>P.pt(r,0,cssv('--green'),'')); },{xname:pb.xn,yname:pb.yn}); };
+  return Q;
+}
+
+/* ---------- Montagem das sessões ---------- */
+const SESS=[
+  ['s1','Construção do gráfico','Lista 1 do guia e Ex. 1 a 6 do livro (pp. 42–43).',genS1],
+  ['s2','Estudo do sinal','Lista 2 do guia e Ex. 7 a 9 do livro (pp. 48–49).',genS2],
+  ['s3','Lei de formação','Lista 3 do guia e Atividades 9 a 12 do livro (pp. 58–60).',genS3],
+  ['s4','Problemas: máximo, mínimo e tempo','Lista 4 do guia e Atividades 4, 13 a 15 do livro.',genS4],
+  ['s5','Tudo misturado','Questões das quatro sessões, em ordem aleatória. Bom para a véspera da prova.',()=>pick([genS1,genS2,genS3,genS4])()],
+];
+const host=$('#panels');
+SESS.forEach(([id,title,desc,gen])=>{
+  const sec=document.createElement('section'); sec.className='panel'; sec.id=id; sec.hidden=true; sec.setAttribute('role','tabpanel');
+  sec.innerHTML=`<h2>${title}</h2><p class="small muted">${desc}</p><div class="score"></div><div class="card"></div>
+    <div class="feedback" role="status" aria-live="polite"></div>
+    <div class="row"><button class="btn chk">Conferir</button><button class="btn ghost sl">Ver solução</button><button class="btn ghost nx">Nova questão</button></div>`;
+  host.appendChild(sec); showScore(id);
+  let Q=null, rec=false;
+  const card=$('.card',sec), fb=$('.feedback',sec), chk=$('.chk',sec), sl=$('.sl',sec);
+  function next(){ rec=false; fb.className='feedback'; fb.innerHTML=''; card.innerHTML=''; Q=gen(); Q.mount(card); chk.disabled=false; sl.disabled=false;
+    const first=$('input',card); if(first && matchMedia('(pointer:fine)').matches) first.focus({preventScroll:true}); }
+  function finish(){ if(!rec){ score(id,Q.firstTry); rec=true; } chk.disabled=true; sl.disabled=true; Q.reveal&&Q.reveal(); }
+  chk.onclick=()=>{ const r=Q.check(); if(!r.ok && !r.noPenalty) Q.firstTry=false; fb.className='feedback '+(r.ok?'ok':'bad'); fb.innerHTML=r.msg; if(r.done) finish(); };
+  sl.onclick=()=>{ Q.firstTry=false; fb.className='feedback bad'; fb.innerHTML='Solução abaixo. Estude e depois tente uma nova questão.'; finish(); };
+  $('.nx',sec).onclick=next;
+  card.addEventListener('keydown',e=>{ if(e.key==='Enter' && e.target.matches('input[name]') && !chk.disabled){ e.preventDefault(); chk.click(); } });
+  next();
+});
+setupTabs();
+
+</script>
+<script src="../../assets/voltar.js" defer></script>
+</body>
+</html>
